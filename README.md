@@ -493,6 +493,14 @@ AI features can be disabled at any time in Settings; all manual features continu
 
 ---
 
+## Accessibility
+
+Accessibility matters. CV Ferret aims to be usable with a keyboard and screen reader — focus is trapped correctly in dialogs, interactive elements have proper labels, and status messages are announced to assistive technology.
+
+If you notice an accessibility issue, please report it at cv.builder.vibe@gmail.com. All reports are welcome and taken seriously.
+
+---
+
 ## Icons & Licences
 
 This project uses [Heroicons](https://heroicons.com) (MIT licensed).
