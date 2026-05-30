@@ -138,13 +138,14 @@ The unified CV editor, opened from the CV Library, the Dashboard, or the Applica
 **Starting a CV:**
 - **Blank** — empty editor with job-structure headings and placeholder text (add your job titles, employer names, and start and end dates in the Experience Pool first)
 - **Load from existing CV** — opens any saved CV document as a starting point; profile and job ad are carried over
+- **Load from Markdown** — import a `.md` file and open it as a new CV document; useful for agent-generated drafts. See [Importing a CV from Markdown](#importing-a-cv-from-markdown) for structure recommendations and limitations.
 
 **Editing:**
 - TipTap rich-text editor with headings, bullet lists, and standard formatting
 - **Pool drawer** — slides in from the left; browse your Experience Pool; check a task to insert it at the correct position, uncheck to remove; swap versions without leaving the editor; edit task metadata (tags, role priorities) inline
 
 **Export:**
-- Export to DOCX and PDF directly from the toolbar
+- Export to **Markdown**, **DOCX**, or **PDF** via the Export dropdown in the toolbar
 - **Save to application** — link the current CV to an existing application or quick-create a new one
 
 **Tracker back-link:**
@@ -161,7 +162,7 @@ When Assembly is opened from the Application Tracker, a "← [Job Title] at [Emp
 
 ### Application Tracker
 - Log applications with employer, job title, job ad URL, and stored job ad text
-- Status arc: **Saved → Applied → Interviewing → Offer → Closed**, with per-status filtering
+- Status arc: **Unprocessed → Applied → Interviewing → Offer → Closed**, with per-status filtering
 - Timestamps: auto-created date; user-set applied date (shown once status moves past Saved)
 - Timestamped **activity notes** — chronological log of events per application (saves immediately, not on form save)
 - **CV source** — three options for the CV linked to each application:
@@ -457,6 +458,77 @@ In **Education & Skills**, click **Import JSON**. All four sections are optional
 Paste your CV text into any LLM (Claude, ChatGPT, etc.) and ask it to convert your work history into the JSON format shown above. Include the field rules and the example structure in your prompt for best results. Always review the output carefully — dates can be misread and bullet points occasionally misattributed.
 
 Imports always **add to** your existing data rather than replacing it.
+
+---
+
+## Importing a CV from Markdown
+
+In the Assembly, the **Load from Markdown** starting option accepts any `.md` or `.txt` file and opens it as a new CV document ready to edit.
+
+### What works and what doesn't
+
+Markdown imports as plain HTML into the TipTap editor. Headings, bullets, bold, and italic all come through correctly. However, the imported content has **no connection to the Experience Pool**:
+
+- Bullet points are plain text — they won't appear as checked items in the Pool drawer and won't be offered as building blocks after saving
+- The Pool drawer shows no checkmarks for imported content
+- To move tasks from an imported CV into your pool, add them manually via the Experience Pool page
+
+Everything else works normally — the AI panel, all export formats (Markdown, DOCX, PDF), and linking to an application.
+
+### Recommended Markdown structure
+
+For the best result, structure your Markdown CV to match the headings the app expects:
+
+```markdown
+# Your Name
+
+Email · Phone · Location · LinkedIn
+
+## Experience
+
+### Job Title
+Employer · Location · Jan 2022 – Present
+
+- First bullet point describing a responsibility or achievement
+- Second bullet point
+
+### Earlier Job Title
+Earlier Employer · Location · Jun 2019 – Dec 2021
+
+- Bullet point
+
+## Education
+
+### Degree Title
+Institution · Graduation year
+
+Notes about the qualification (optional)
+
+## Skills
+
+Python, SQL, Power BI, Tableau
+
+## Languages
+
+English (Native), German (C1)
+```
+
+**Key rules:**
+
+- `#` for your name (one only)
+- `##` for section headings — `Experience`, `Education`, `Skills`, `Languages` match the app's export template
+- `###` for each role or qualification — one heading per job
+- The **first line after a `###` heading** is treated as the employer/date line in exports — keep it as a single short line
+- Use `-` for task bullets under each role
+- One role per `###` heading — if you held multiple titles at the same employer, use separate headings
+
+### Generating a Markdown CV with an AI tool
+
+Ask any LLM to produce a CV in the structure above. A prompt like this works well:
+
+> Write a CV for the following work history in Markdown. Use `#` for the name, `##` for section headings (Experience, Education, Skills, Languages), and `###` for each job or qualification. Put employer and dates on the first line after each `###` heading. Use `-` for bullet points.
+
+Always review the output — dates can be misread and bullets occasionally misattributed across roles.
 
 ---
 

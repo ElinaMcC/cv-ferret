@@ -183,18 +183,25 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
 
         {/* Markdown file picker */}
         {mode === 'markdown' && (
-          <label className="asm-dialog-label">
-            Markdown file
-            <input
-              type="file"
-              accept=".md,.txt"
-              className="asm-dialog-file-input"
-              onChange={handleMarkdownFile}
-            />
-            {markdownFileName && (
-              <span className="asm-dialog-hint">✓ {markdownFileName}</span>
-            )}
-          </label>
+          <>
+            <label className="asm-dialog-label">
+              Markdown file
+              <input
+                type="file"
+                accept=".md,.txt"
+                className="asm-dialog-file-input"
+                onChange={handleMarkdownFile}
+              />
+              {markdownFileName && (
+                <span className="asm-dialog-hint">✓ {markdownFileName}</span>
+              )}
+            </label>
+            <p className="asm-dialog-hint">
+              Content imports as plain text. Bullets won't be linked to your Experience
+              Pool and won't be offered as building blocks — to add tasks to the pool,
+              use the Experience Pool page after importing.
+            </p>
+          </>
         )}
 
         {/* CV picker: shown in existing mode, grouped by profile */}
