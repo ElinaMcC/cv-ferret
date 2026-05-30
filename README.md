@@ -22,10 +22,8 @@ npm install
 3. Open your browser at **http://localhost:5173**
 
 This starts two processes concurrently:
-- **Frontend**: Vite dev server on http://localhost:5173
-- **Backend**: Express API server on http://localhost:5000
-
-> **Important:** The backend (Node.js server) does **not** hot-reload. After changing any file under `src/main/`, stop the terminal and run `npm run dev` again to pick up the changes.
+- **Frontend**: Vite dev server on http://localhost:5173 (hot-reloads automatically)
+- **Backend**: Express API server on http://localhost:5000 (auto-restarts via nodemon on changes to `src/main/`)
 
 > **macOS note:** Port 5000 is used by AirPlay Receiver on macOS Monterey and later, which will prevent the backend from starting. Either disable AirPlay Receiver in System Settings → General → AirDrop & Handoff, or change the port by editing the `PORT` value at the top of `src/main/server.js` and updating the `API_BASE` URL in `src/renderer/services/ipc.js` to match.
 
@@ -371,7 +369,7 @@ src/
 
 ## Project Status
 
-All core features are complete and working. The app underwent a major refactor (tracked in `REFACTOR-PLAN.md`) that unified the CV editing experience, introduced profiles, and added a conversational AI assistant.
+All core features are complete and working. The app underwent a major refactor that unified the CV editing experience, introduced profiles, and added a conversational AI assistant.
 
 | Phase | Description | Status |
 |-------|-------------|--------|
@@ -386,7 +384,6 @@ All core features are complete and working. The app underwent a major refactor (
 | 8 | Dashboard updates: New CV button, Recent CVs, stats updated to new data model | ✅ Complete |
 | 9 | Polish and documentation | 🔜 Next |
 
-The pre-refactor state is preserved on the `stable/pre-refactor` branch.
 
 ---
 
@@ -457,9 +454,7 @@ In **Education & Skills**, click **Import JSON**. All four sections are optional
 
 ### Using an AI tool to extract your CV
 
-See **[CV-EXTRACTION.md](./CV-EXTRACTION.md)** for ready-to-use LLM prompt templates,
-detailed field rules, and tips for better extraction accuracy. The template is
-LLM-agnostic — use it with any AI tool.
+Paste your CV text into any LLM (Claude, ChatGPT, etc.) and ask it to convert your work history into the JSON format shown above. Include the field rules and the example structure in your prompt for best results. Always review the output carefully — dates can be misread and bullet points occasionally misattributed.
 
 Imports always **add to** your existing data rather than replacing it.
 
@@ -500,7 +495,7 @@ AI features can be disabled at any time in Settings; all manual features continu
 
 ## Icons & Licences
 
-This project uses [Heroicons](https://heroicons.com) (MIT licensed). See [ICON_GUIDELINES.md](./ICON_GUIDELINES.md) for how to add new icons.
+This project uses [Heroicons](https://heroicons.com) (MIT licensed).
 
 All third-party dependencies (React, Vite, Express, docx, pdfkit, TipTap, Zustand, react-rnd, and others) are MIT licensed.
 

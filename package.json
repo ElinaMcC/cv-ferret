@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:react\" \"npm run dev:server\"",
     "dev:react": "vite",
-    "dev:server": "wait-on http://localhost:5173 && node src/main/server.js",
+    "dev:server": "wait-on http://localhost:5173 && nodemon --watch src/main src/main/server.js",
     "build": "vite build",
     "start": "cross-env NODE_ENV=production node src/main/server.js",
     "preview": "vite preview",
@@ -52,6 +52,7 @@
     "@yao-pkg/pkg": "^6.14.2",
     "concurrently": "^8.2.2",
     "cross-env": "^10.1.0",
+    "nodemon": "^3.1.14",
     "vite": "^5.0.10",
     "vitest": "^4.1.7",
     "wait-on": "^7.0.1"
