@@ -402,6 +402,20 @@ html.dark .cvlib-icon-btn-danger:hover {
   line-height: 1.5;
 }
 
+.modal-warning {
+  color: var(--color-warning-text, #92400e);
+  background: var(--color-warning-bg, #fef3c7);
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: -8px;
+}
+
+.cvlib-subsection-desc {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: -6px 0 10px;
+}
+
 .modal-form { display: flex; flex-direction: column; gap: 14px; }
 
 .modal-label {

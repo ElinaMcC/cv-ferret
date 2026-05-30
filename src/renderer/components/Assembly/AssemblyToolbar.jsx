@@ -184,7 +184,7 @@ export default function AssemblyToolbar({
             <Bars3Icon className="icon" /> Pool
           </button>
 
-          <button className="btn btn-ghost btn-sm btn-with-icon" onClick={onLinkToApp} title="Link to application">
+          <button className="btn btn-ghost btn-sm btn-with-icon" onClick={onLinkToApp} title="Link to application — cover letters are written in the Application Tracker">
             <LinkIcon className="icon" /> Link
           </button>
 

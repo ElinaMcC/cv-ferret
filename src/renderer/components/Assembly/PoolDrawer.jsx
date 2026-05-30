@@ -27,10 +27,13 @@ export default function PoolDrawer({ editorRef }) {
   const startWidthRef = useRef(420);
   const activeRowRef  = useRef(null);
 
-  // Fetch pool data the first time the drawer opens.
+  // Fetch pool data the first time the drawer opens; clear search when it closes.
   useEffect(() => {
     if (drawerOpen && jobs.length === 0 && !loadingJobs) {
       loadJobs();
+    }
+    if (!drawerOpen) {
+      setFilterState({ query: '' });
     }
   }, [drawerOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -157,6 +160,11 @@ export default function PoolDrawer({ editorRef }) {
 
         {/* Body */}
         <div className="pool-drawer-body">
+          {!loadingJobs && jobs.length > 0 && (
+            <p className="pool-drawer-usage-hint">
+              Tick a task to insert it into your CV. Untick to remove.
+            </p>
+          )}
           {loadingJobs && <p className="pool-status-msg">Loading…</p>}
           {!loadingJobs && filteredJobs.length === 0 && (
             <p className="pool-status-msg">

@@ -56,7 +56,11 @@ export default function Dashboard({ onNavigate }) {
 
   useEffect(() => {
     dashboardAPI.getSummary()
-      .then(setData)
+      .then(d => {
+        setData(d);
+        // Expand the flow guide automatically for brand-new users.
+        if (d.stats.jobCount === 0 && d.stats.cvDocumentCount === 0) setShowFlow(true);
+      })
       .catch(err => setError(err.message));
   }, []);
 

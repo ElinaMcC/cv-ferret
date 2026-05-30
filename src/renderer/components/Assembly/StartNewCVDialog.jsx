@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
 import { profileAPI, cvDocumentAPI, documentAPI } from '../../services/ipc.js';
+import { usePoolStore } from '../../stores/poolStore.js';
 
 // Three ways to start a new CV:
 //
@@ -35,6 +36,9 @@ function uniqueDefaultTitle(existingDocs) {
 }
 
 export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCancel, inline = false }) {
+  const poolJobs = usePoolStore(s => s.jobs);
+  const poolEmpty = poolJobs.length === 0;
+
   const [mode, setMode]               = useState('scratch');
   const [title, setTitle]             = useState(defaultTitle);
   const [profiles, setProfiles]       = useState([]);
@@ -154,14 +158,20 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
             selected={mode === 'scratch'}
             onSelect={() => setMode('scratch')}
             title="Start from scratch"
-            description="Job structure prefilled from your pool. Task areas are empty — add what you need."
+            description={poolEmpty
+              ? 'Your Experience Pool is empty — add jobs and tasks there first for the best results. You can still start a blank document.'
+              : 'Job structure prefilled from your pool. Task areas are empty — add what you need.'}
           />
           <ModeCard
             id="defaults"
             selected={mode === 'defaults'}
             onSelect={() => setMode('defaults')}
             title="Load defaults"
-            description="All your default task versions inserted as a starting point to edit down from."
+            description={poolEmpty
+              ? 'Your Experience Pool is empty — there are no default versions to insert yet.'
+              : 'All your default task versions inserted as a starting point to edit down from.'}
+            disabled={poolEmpty}
+            disabledHint="Add jobs and tasks to your Experience Pool first."
           />
           <ModeCard
             id="existing"

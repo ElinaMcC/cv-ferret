@@ -5,7 +5,8 @@ import {
   ChatBubbleBottomCenterTextIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
-import { profileAPI, cvDocumentAPI } from '../services/ipc.js';
+import { profileAPI, cvDocumentAPI, applicationAPI } from '../services/ipc.js';
+import { useFocusTrap } from '../hooks/useFocusTrap.js';
 import { useToast } from '../contexts/ToastContext.jsx';
 import '../styles/shared.css';
 import './CVLibrary.css';
@@ -31,12 +32,13 @@ function storeId(id) {
 export default function CVLibrary({ onNavigate }) {
   const [profiles, setProfiles]           = useState([]);
   const [cvDocuments, setCvDocuments]     = useState([]);
+  const [applications, setApplications]   = useState([]);
   const [selectedId, setSelectedId]       = useState(readStoredId);
   const [loading, setLoading]             = useState(true);
   const [showModal, setShowModal]         = useState(false);
   const [editingProfile, setEditingProfile] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [editingCvDoc, setEditingCvDoc]   = useState(null); // cv_document being edited
+  const [editingCvDoc, setEditingCvDoc]   = useState(null);
   const { showToast } = useToast();
 
   useEffect(() => { loadAll(); }, []);
@@ -49,9 +51,10 @@ export default function CVLibrary({ onNavigate }) {
   async function loadAll() {
     try {
       setLoading(true);
-      const [p, d] = await Promise.all([profileAPI.list(), cvDocumentAPI.list()]);
+      const [p, d, apps] = await Promise.all([profileAPI.list(), cvDocumentAPI.list(), applicationAPI.list()]);
       setProfiles(p);
       setCvDocuments(d);
+      setApplications(apps);
 
       const unorganised = d.filter(doc => !doc.profile_id);
       const stored = readStoredId();
@@ -266,7 +269,7 @@ export default function CVLibrary({ onNavigate }) {
               onClone={handleCloneCv}
               onMove={handleMoveCvDoc}
               onEditDetails={setEditingCvDoc}
-              onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title })}
+              onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title, linkedApps: applications.filter(a => a.cv_document_id === id).length })}
               onNewCv={() => handleNewCv(null)}
             />
           ) : selectedProfile ? (
@@ -282,7 +285,7 @@ export default function CVLibrary({ onNavigate }) {
               onClone={handleCloneCv}
               onMove={handleMoveCvDoc}
               onEditDetails={setEditingCvDoc}
-              onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title })}
+              onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title, linkedApps: applications.filter(a => a.cv_document_id === id).length })}
               onNewCv={() => handleNewCv(selectedProfile.id)}
             />
           ) : (
@@ -315,6 +318,7 @@ export default function CVLibrary({ onNavigate }) {
         <DeleteConfirmModal
           name={deleteConfirm.name}
           isProfile={deleteConfirm.type === 'profile'}
+          linkedApps={deleteConfirm.linkedApps ?? 0}
           onConfirm={() => deleteConfirm.type === 'profile'
             ? handleDeleteProfile(deleteConfirm.id)
             : handleDeleteCvDoc(deleteConfirm.id)
@@ -388,9 +392,10 @@ function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, on
         <h3 className="cvlib-subsection-heading">
           <StarSolid className="cvlib-star-icon" /> Primary CV
         </h3>
+        <p className="cvlib-subsection-desc">Your go-to draft for this profile — the baseline you tailor variants from.</p>
         {primaryDocs.length === 0 ? (
           <p className="cvlib-empty-hint">
-            No primary CV set. Mark any variant as primary to feature it here.
+            No primary CV set. Open any variant and star it to feature it here.
           </p>
         ) : (
           <ul className="cvlib-doc-list">
@@ -517,6 +522,8 @@ function ProfileModal({ profile, onSave, onClose }) {
   const [name, setName]        = useState(profile?.name ?? '');
   const [description, setDesc] = useState(profile?.description ?? '');
   const nameRef = useRef(null);
+  const boxRef  = useRef(null);
+  useFocusTrap(true, boxRef);
 
   useEffect(() => { nameRef.current?.focus(); }, []);
 
@@ -527,9 +534,10 @@ function ProfileModal({ profile, onSave, onClose }) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()}>
-        <h2 className="modal-title">{profile ? 'Edit profile' : 'New profile'}</h2>
+    <div className="modal-overlay" onClick={onClose} onKeyDown={e => e.key === 'Escape' && onClose()}>
+      <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title"
+           ref={boxRef} onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title" id="profile-modal-title">{profile ? 'Edit profile' : 'New profile'}</h2>
         <form onSubmit={handleSubmit} className="modal-form">
           <label className="modal-label">
             Name
@@ -561,6 +569,8 @@ function EditCvDetailsModal({ doc, onSave, onClose }) {
   const [name, setName]   = useState(doc.title || '');
   const [notes, setNotes] = useState(doc.notes || '');
   const nameRef = useRef(null);
+  const boxRef  = useRef(null);
+  useFocusTrap(true, boxRef);
 
   useEffect(() => { nameRef.current?.focus(); }, []);
 
@@ -571,9 +581,10 @@ function EditCvDetailsModal({ doc, onSave, onClose }) {
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-box" onClick={e => e.stopPropagation()}>
-        <h2 className="modal-title">Edit CV details</h2>
+    <div className="modal-overlay" onClick={onClose} onKeyDown={e => e.key === 'Escape' && onClose()}>
+      <div className="modal-box" role="dialog" aria-modal="true" aria-labelledby="edit-cv-modal-title"
+           ref={boxRef} onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title" id="edit-cv-modal-title">Edit CV details</h2>
         <form onSubmit={handleSubmit} className="modal-form">
           <label className="modal-label">
             Name
@@ -610,17 +621,26 @@ function EditCvDetailsModal({ doc, onSave, onClose }) {
 
 // ── DeleteConfirmModal ────────────────────────────────────────────────────────
 
-function DeleteConfirmModal({ name, isProfile, onConfirm, onCancel }) {
+function DeleteConfirmModal({ name, isProfile, linkedApps = 0, onConfirm, onCancel }) {
+  const boxRef = useRef(null);
+  useFocusTrap(true, boxRef);
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-box" onClick={e => e.stopPropagation()}>
-        <h2 className="modal-title">Delete {isProfile ? 'profile' : 'CV'}?</h2>
+    <div className="modal-overlay" onClick={onCancel} onKeyDown={e => e.key === 'Escape' && onCancel()}>
+      <div className="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="delete-modal-title"
+           ref={boxRef} onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title" id="delete-modal-title">Delete {isProfile ? 'profile' : 'CV'}?</h2>
         <p className="modal-body-text">
           {isProfile
             ? <>Deleting <strong>{name}</strong> will remove the profile. CVs in this profile will become unorganised but will not be deleted.</>
             : <>Delete <strong>{name}</strong>? This cannot be undone.</>
           }
         </p>
+        {!isProfile && linkedApps > 0 && (
+          <p className="modal-body-text modal-warning">
+            This CV is linked to {linkedApps} application{linkedApps !== 1 ? 's' : ''}.
+            Deleting it will remove the link — the application record will remain but without a CV attached.
+          </p>
+        )}
         <div className="modal-actions">
           <button className="btn btn-ghost btn-sm" onClick={onCancel}>Cancel</button>
           <button className="btn btn-danger btn-sm" onClick={onConfirm}>Delete</button>

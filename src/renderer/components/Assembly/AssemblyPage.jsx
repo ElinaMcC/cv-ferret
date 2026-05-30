@@ -59,6 +59,7 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
   const [showLinkModal, setShowLinkModal]       = useState(false);
   const [showSaveAsModal, setShowSaveAsModal]   = useState(false);
   const [exportNotification, setExportNotification] = useState(null);
+  const [exportPathMissing, setExportPathMissing]   = useState(false);
   const [buildingBlockItems, setBuildingBlockItems] = useState(null);
   const [profiles, setProfiles]               = useState([]);
   // The Tiptap editor instance, retrieved once after AssemblyEditor signals ready.
@@ -142,6 +143,16 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
       pendingContentRef.current = null;
     }
   }
+
+  // ── Browser tab / window close guard ────────────────────────────────────────
+
+  useEffect(() => {
+    function handleBeforeUnload(e) {
+      if (isDirty) { e.preventDefault(); e.returnValue = ''; }
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   // ── Navigation guard ────────────────────────────────────────────────────────
 
@@ -336,7 +347,11 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
       showToast(`Exported: ${fileName}`);
       setExportNotification({ fileName, folderPath });
     } catch (err) {
-      showToast('Export failed: ' + err.message, 'error');
+      if (err.message.includes('Export path not set')) {
+        setExportPathMissing(true);
+      } else {
+        showToast('Export failed: ' + err.message, 'error');
+      }
     } finally {
       setExporting(false);
     }
@@ -442,6 +457,24 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
 
       {documentId && (
         <div className="asm-inner">
+          {exportPathMissing && (
+            <div className="asm-export-banner asm-export-banner-error">
+              <span>No export path set — choose a folder where files will be saved.</span>
+              <div className="asm-export-banner-actions">
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => { setExportPathMissing(false); onNavigate('settings'); }}
+                >
+                  Go to Settings →
+                </button>
+                <button
+                  className="asm-export-banner-dismiss"
+                  onClick={() => setExportPathMissing(false)}
+                  aria-label="Dismiss"
+                >×</button>
+              </div>
+            </div>
+          )}
           {exportNotification && (
             <div className="asm-export-banner">
               <span>Saved to <code className="asm-export-banner-path">{exportNotification.folderPath}</code></span>

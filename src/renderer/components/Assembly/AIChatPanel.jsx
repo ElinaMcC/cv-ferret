@@ -756,7 +756,7 @@ export default function AIChatPanel({ editorRef, getDocumentStructure }) {
       </div>
 
       <div className="ai-panel-footer">
-        Chat history is not saved between sessions.
+        Chat history is not saved between sessions. · Cover letters are written in the <strong>Application Tracker</strong>.
       </div>
     </div>
   );

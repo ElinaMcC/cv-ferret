@@ -198,6 +198,12 @@
 }
 .asm-export-banner-dismiss:hover { color: var(--text-primary); }
 
+.asm-export-banner-error {
+  background: var(--color-warning-bg, #fef3c7);
+  color: var(--color-warning-text, #92400e);
+  border-bottom-color: var(--color-warning-text, #92400e);
+}
+
 /* ── Formatting bar ──────────────────────────────────────────────────────────── */
 
 /* ── Profile row (between title and formatting bar) ─────────────────────────── */
@@ -678,6 +684,12 @@ html.dark .asm-mode-card.selected { background: var(--color-info-bg); }
   color: var(--text-muted);
   padding: 16px 14px;
   text-align: center;
+}
+
+.pool-drawer-usage-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  padding: 8px 14px 4px;
 }
 
 .pool-drawer-tip {

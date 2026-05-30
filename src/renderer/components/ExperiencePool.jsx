@@ -25,6 +25,8 @@ export default function ExperiencePool() {
   const [pendingVersions, setPendingVersions] = useState({});
   const [batchRunning, setBatchRunning] = useState(false);
   const [batchResult, setBatchResult] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(null); // { type:'task'|'version', id, label }
+  const [generateConfirm, setGenerateConfirm] = useState(null); // { count } | null
   const savedScroll = useRef(0);
   const showToast = useToast();
 
@@ -111,27 +113,28 @@ export default function ExperiencePool() {
     }
   }
 
-  async function handleDeleteTask(taskId) {
-    if (!window.confirm('Delete this task and all its versions?')) return;
-
-    try {
-      await taskAPI.deleteTask(taskId);
-      loadJobs();
-      showToast('Deleted.');
-    } catch (err) {
-      setError(err.message);
-    }
+  async function handleDeleteTask(taskId, description) {
+    setConfirmDelete({ type: 'task', id: taskId, label: description || 'this task' });
   }
 
-  async function handleDeleteVersion(versionId) {
-    if (!window.confirm('Delete this version?')) return;
+  async function handleDeleteVersion(versionId, description) {
+    setConfirmDelete({ type: 'version', id: versionId, label: description || 'this version' });
+  }
 
+  async function confirmDeleteAction() {
+    if (!confirmDelete) return;
     try {
-      await taskAPI.deleteTaskVersion(versionId);
+      if (confirmDelete.type === 'task') {
+        await taskAPI.deleteTask(confirmDelete.id);
+      } else {
+        await taskAPI.deleteTaskVersion(confirmDelete.id);
+      }
+      setConfirmDelete(null);
       loadJobs();
       showToast('Deleted.');
     } catch (err) {
       setError(err.message);
+      setConfirmDelete(null);
     }
   }
 
@@ -219,9 +222,12 @@ export default function ExperiencePool() {
   async function handleGenerateAll() {
     const eligible = jobs.reduce((n, j) =>
       n + (j.tasks || []).filter(t => !t.versions.some(v => v.role_priorities && v.role_priorities.length > 0)).length, 0);
-    if (eligible === 0) { alert('All tasks already have role-specific versions.'); return; }
-    if (!window.confirm(`Generate role-specific versions for ${eligible} task${eligible !== 1 ? 's' : ''}? This may take a few minutes.`)) return;
-    setBatchRunning(true);
+    if (eligible === 0) { showToast('All tasks already have role-specific versions.'); return; }
+    setGenerateConfirm({ count: eligible });
+  }
+
+  async function confirmGenerateAll() {
+    setGenerateConfirm(null);
     setBatchResult(null);
     setError('');
     try {
@@ -339,7 +345,7 @@ export default function ExperiencePool() {
         </div>
       </div>
 
-      <p className="page-subtitle">Your complete work history — all jobs and duties, unfiltered. Add multiple versions of each task to tailor the wording for different roles. CV Assembly lets you pick and combine them into a targeted CV.</p>
+      <p className="page-subtitle">Your complete work history — all jobs and duties, unfiltered. Each task can have <strong>multiple versions</strong>: alternate wordings for different roles or audiences. Use the <strong>+</strong> button on any task to add one. CV Assembly lets you pick and combine them into a targeted CV.</p>
 
       {aiEnabled && batchResult && (
         <div className="batch-result">
@@ -508,7 +514,7 @@ export default function ExperiencePool() {
                       )}
                       <button
                         className="icon-btn delete-btn"
-                        onClick={() => handleDeleteTask(task.id)}
+                        onClick={() => handleDeleteTask(task.id, defaultVersion?.description)}
                         title="Delete task"
                         aria-label="Delete task"
                       >
@@ -619,7 +625,7 @@ export default function ExperiencePool() {
                               )}
                               <button
                                 className="icon-btn delete-btn"
-                                onClick={() => handleDeleteVersion(version.id)}
+                                onClick={() => handleDeleteVersion(version.id, version.description)}
                                 title="Delete version"
                               >
                                 <Icon.Delete className="icon" />
@@ -651,6 +657,43 @@ export default function ExperiencePool() {
         }}
       />
     )}
+
+    {confirmDelete && (
+      <ConfirmDialog
+        title={confirmDelete.type === 'task' ? 'Delete task?' : 'Delete version?'}
+        body={confirmDelete.type === 'task'
+          ? 'This will delete the task and all its versions. This cannot be undone.'
+          : 'This will permanently delete this version.'}
+        confirmLabel="Delete"
+        onConfirm={confirmDeleteAction}
+        onCancel={() => setConfirmDelete(null)}
+      />
+    )}
+
+    {generateConfirm && (
+      <ConfirmDialog
+        title={`Generate versions for ${generateConfirm.count} task${generateConfirm.count !== 1 ? 's' : ''}?`}
+        body={`This will call the Anthropic API once per task. Depending on your usage it may incur a small cost. Existing role-specific versions won't be affected.`}
+        confirmLabel="Generate"
+        onConfirm={confirmGenerateAll}
+        onCancel={() => setGenerateConfirm(null)}
+      />
+    )}
     </>
+  );
+}
+
+function ConfirmDialog({ title, body, confirmLabel, onConfirm, onCancel }) {
+  return (
+    <div className="ep-confirm-overlay" onKeyDown={e => e.key === 'Escape' && onCancel()}>
+      <div className="ep-confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="ep-confirm-title">
+        <h3 id="ep-confirm-title">{title}</h3>
+        <p>{body}</p>
+        <div className="ep-confirm-actions">
+          <button className="btn btn-secondary btn-sm" onClick={onCancel}>Cancel</button>
+          <button className="btn btn-danger btn-sm" onClick={onConfirm}>{confirmLabel}</button>
+        </div>
+      </div>
+    </div>
   );
 }
