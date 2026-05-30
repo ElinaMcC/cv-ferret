@@ -39,14 +39,19 @@ dbModule.performAutoBackup();
 // Middleware
 app.use(express.json());
 
-// CORS — allow requests from Vite dev server
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  if (req.method === 'OPTIONS') res.sendStatus(200);
-  else next();
-});
+// CORS — only needed in development, where the Vite dev server (port 5173)
+// makes cross-origin requests to this server (port 5000).
+// In production the frontend is served by Express itself (same origin),
+// so no CORS headers are set at all.
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    if (req.method === 'OPTIONS') res.sendStatus(200);
+    else next();
+  });
+}
 
 // Serve static files from dist (production only)
 if (process.env.NODE_ENV === 'production') {

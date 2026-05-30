@@ -2,17 +2,29 @@
 
 const path   = require('path');
 const fs     = require('fs');
+const { v4: uuidv4 } = require('uuid');
 const { Router } = require('express');
 const multer = require('multer');
 const db     = require('../db.js');
 
+const ALLOWED_EXTENSIONS = new Set(['.pdf', '.docx']);
+
 // Multer storage: destination is resolved lazily so db.getRefLettersDir() is
 // called after the database has been initialised (which happens in server.js).
+// Files are stored under a UUID name to prevent path traversal via originalname.
 const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, db.getRefLettersDir()),
-    filename:    (req, file, cb) => cb(null, file.originalname),
+    filename:    (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      cb(null, `${uuidv4()}${ext}`);
+    },
   }),
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, ALLOWED_EXTENSIONS.has(ext));
+  },
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
 });
 
 const router = Router();
