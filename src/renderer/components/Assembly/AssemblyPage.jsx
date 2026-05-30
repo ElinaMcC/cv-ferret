@@ -9,7 +9,7 @@ import StartNewCVDialog        from './StartNewCVDialog.jsx';
 import SaveToApplicationModal  from './SaveToApplicationModal.jsx';
 import { useAssemblyStore } from '../../stores/assemblyStore.js';
 import { usePoolStore }     from '../../stores/poolStore.js';
-import { cvDocumentAPI, settingsAPI, profileAPI, taskAPI } from '../../services/ipc.js';
+import { cvDocumentAPI, settingsAPI, profileAPI, taskAPI, exportAPI } from '../../services/ipc.js';
 import { findJobIdForPosition, getAllPlainItems } from './tiptapUtils.js';
 import { useToast }        from '../../contexts/ToastContext.jsx';
 import './Assembly.css';
@@ -58,6 +58,7 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
   const [aiEnabled, setAiEnabled]             = useState(false);
   const [showLinkModal, setShowLinkModal]       = useState(false);
   const [showSaveAsModal, setShowSaveAsModal]   = useState(false);
+  const [exportNotification, setExportNotification] = useState(null);
   const [buildingBlockItems, setBuildingBlockItems] = useState(null);
   const [profiles, setProfiles]               = useState([]);
   // The Tiptap editor instance, retrieved once after AssemblyEditor signals ready.
@@ -328,7 +329,12 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
       const result = format === 'pdf'
         ? await cvDocumentAPI.exportPdf(documentId)
         : await cvDocumentAPI.exportDocx(documentId);
-      showToast(`Exported: ${result.filePath.split(/[\\/]/).pop()}`);
+      const sep = result.filePath.includes('\\') ? '\\' : '/';
+      const lastSep = Math.max(result.filePath.lastIndexOf('\\'), result.filePath.lastIndexOf('/'));
+      const folderPath = result.filePath.substring(0, lastSep);
+      const fileName   = result.filePath.substring(lastSep + 1);
+      showToast(`Exported: ${fileName}`);
+      setExportNotification({ fileName, folderPath });
     } catch (err) {
       showToast('Export failed: ' + err.message, 'error');
     } finally {
@@ -436,6 +442,24 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
 
       {documentId && (
         <div className="asm-inner">
+          {exportNotification && (
+            <div className="asm-export-banner">
+              <span>Saved to <code className="asm-export-banner-path">{exportNotification.folderPath}</code></span>
+              <div className="asm-export-banner-actions">
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => exportAPI.openFolder(exportNotification.folderPath)}
+                >
+                  Open folder ↗
+                </button>
+                <button
+                  className="asm-export-banner-dismiss"
+                  onClick={() => setExportNotification(null)}
+                  aria-label="Dismiss"
+                >×</button>
+              </div>
+            </div>
+          )}
           <AssemblyToolbar
             editor={editorInstance}
             onSave={handleSave}
