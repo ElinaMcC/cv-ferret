@@ -737,7 +737,7 @@ function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
 
         <div className="asm-dialog-actions">
           <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={saving}>
-            {toSave.length === 0 ? 'Skip all' : 'Cancel'}
+            Cancel
           </button>
           <button
             className="btn btn-primary btn-sm"
