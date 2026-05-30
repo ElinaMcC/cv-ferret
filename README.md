@@ -136,9 +136,10 @@ Browser (React/Vite)  ←→  Express API (Node.js)  ←→  JSON files on disk
 The unified CV editor, opened from the CV Library, the Dashboard, or the Application Tracker.
 
 **Starting a CV:**
-- **Blank** — empty editor with job-structure headings and placeholder text (add your job titles, employer names, and start and end dates in the Experience Pool first)
-- **Load from existing CV** — opens any saved CV document as a starting point; profile and job ad are carried over
-- **Load from Markdown** — import a `.md` file and open it as a new CV document; useful for agent-generated drafts. See [Importing a CV from Markdown](#importing-a-cv-from-markdown) for structure recommendations and limitations.
+- **Start from skeleton** — generates a document from your Experience Pool: job headings with empty task areas. Use the pool drawer to insert the tasks you need. Requires jobs in your pool.
+- **Pre-fill from pool** — same structure, but with all default task versions already inserted as a starting point to trim down. Requires jobs in your pool.
+- **Copy a saved draft** — clones a CV you've previously built in the app. Only CVs created in CV Ferret appear here, not external files. Disabled until you have at least one saved draft.
+- **Import from Markdown** — import a `.md` file and open it as a new CV document; useful for agent-generated drafts. See [Importing a CV from Markdown](#importing-a-cv-from-markdown) for structure recommendations and limitations.
 
 **Editing:**
 - TipTap rich-text editor with headings, bullet lists, and standard formatting

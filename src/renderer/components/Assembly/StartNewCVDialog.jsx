@@ -157,19 +157,19 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
             id="scratch"
             selected={mode === 'scratch'}
             onSelect={() => setMode('scratch')}
-            title="Start from scratch"
+            title="Start from skeleton"
             description={poolEmpty
-              ? 'Your Experience Pool is empty — add jobs and tasks there first for the best results. You can still start a blank document.'
-              : 'Job structure prefilled from your pool. Task areas are empty — add what you need.'}
+              ? 'Your Experience Pool is empty, so the skeleton will have minimal structure. Add jobs and tasks to your pool first for the best result.'
+              : 'Creates a document from your pool — job headings with empty task areas. Use the pool drawer to insert the tasks you need.'}
           />
           <ModeCard
             id="defaults"
             selected={mode === 'defaults'}
             onSelect={() => setMode('defaults')}
-            title="Load defaults"
+            title="Pre-fill from pool"
             description={poolEmpty
-              ? 'Your Experience Pool is empty — there are no default versions to insert yet.'
-              : 'All your default task versions inserted as a starting point to edit down from.'}
+              ? 'Your Experience Pool is empty — there are no tasks to pre-fill yet.'
+              : 'Opens a document with all your default task versions already inserted. Trim it down to what this application needs.'}
             disabled={poolEmpty}
             disabledHint="Add jobs and tasks to your Experience Pool first."
           />
@@ -177,17 +177,17 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
             id="existing"
             selected={mode === 'existing'}
             onSelect={() => setMode('existing')}
-            title="Load from existing CV"
-            description="Clone any CV you've already created as a starting point for a new variant."
+            title="Copy a saved draft"
+            description="Clones a CV you've previously built in this app as a starting point for a new variant. Only CVs created in CV Ferret appear here — not external files."
             disabled={cvDocuments.length === 0}
-            disabledHint="No CVs yet — create one first using scratch or defaults."
+            disabledHint="No saved drafts yet — create one using another option first, then come back here."
           />
           <ModeCard
             id="markdown"
             selected={mode === 'markdown'}
             onSelect={() => setMode('markdown')}
-            title="Load from Markdown"
-            description="Import a CV written in Markdown — useful for agent-generated drafts."
+            title="Import from Markdown"
+            description="Opens a .md file as a new CV document. Useful for agent-generated drafts. Content won't be pool-linked."
           />
         </div>
 
