@@ -15,6 +15,7 @@ function FmtBtn({ onClick, active, title, children }) {
       className={`asm-fmt-btn${active ? ' active' : ''}`}
       onClick={onClick}
       title={title}
+      aria-label={title}
       type="button"
     >
       {children}

@@ -16,6 +16,8 @@ export function ToastProvider({ children }) {
         <div
           key={toast.key}
           className={`toast${toast.type === 'error' ? ' toast-error' : ''}`}
+          role={toast.type === 'error' ? 'alert' : 'status'}
+          aria-live={toast.type === 'error' ? 'assertive' : 'polite'}
           onAnimationEnd={() => setToast(null)}
         >
           {toast.message}

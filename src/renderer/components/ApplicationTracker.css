@@ -111,10 +111,17 @@
 /* ── Application card ────────────────────────────────────────────────────────── */
 
 .at-card {
-  padding: 11px 16px;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
   border-bottom: 1px solid var(--bg-tertiary);
+  padding: 11px 16px;
   cursor: pointer;
   transition: background 0.1s;
+  font: inherit;
+  color: inherit;
 }
 
 .at-card:hover { background: var(--bg-secondary); }

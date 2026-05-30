@@ -66,7 +66,11 @@ function AppCard({ app, isSelected, onClick }) {
     : formatDate(app.created_at.split('T')[0]);
 
   return (
-    <div className={`at-card ${isSelected ? 'at-card-selected' : ''}`} onClick={onClick}>
+    <button
+      className={`at-card ${isSelected ? 'at-card-selected' : ''}`}
+      onClick={onClick}
+      aria-pressed={isSelected}
+    >
       <div className="at-card-main">
         <span className="at-card-title">{app.job_title || '(No title)'}</span>
         <span className="at-card-employer">{app.employer || '(No employer)'}</span>
@@ -75,7 +79,7 @@ function AppCard({ app, isSelected, onClick }) {
         <StatusBadge status={app.status} />
         <span className="at-card-date">{dateLabel}</span>
       </div>
-    </div>
+    </button>
   );
 }
 

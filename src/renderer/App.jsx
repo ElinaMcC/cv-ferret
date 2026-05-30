@@ -95,6 +95,7 @@ export default function App() {
                   className={`nav-btn${currentView === id ? ' active' : ''}`}
                   onClick={() => navigate(id)}
                   aria-current={currentView === id ? 'page' : undefined}
+                  aria-label={navCollapsed ? label : undefined}
                   title={navCollapsed ? label : undefined}
                 >
                   <Icon className="nav-icon" aria-hidden="true" />

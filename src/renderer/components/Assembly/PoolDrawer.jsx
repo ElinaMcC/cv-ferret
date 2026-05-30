@@ -118,6 +118,7 @@ export default function PoolDrawer({ editorRef }) {
               className="pool-icon-btn"
               onClick={loadJobs}
               title="Refresh pool"
+              aria-label="Refresh pool"
               disabled={loadingJobs}
             >
               <ArrowPathIcon className={`pool-icon${loadingJobs ? ' spinning' : ''}`} />
@@ -397,11 +398,13 @@ function TaskRow({ task, insertedVersionMap, activeTaskItem, activeRowRef, onTog
               {!editingVersionId && confirmDeleteId !== 'task' && (
                 <div className="pool-version-actions">
                   <button className="pool-action-btn" type="button"
-                          onClick={() => startEdit(defaultVersion)} title="Edit in pool">
+                          onClick={() => startEdit(defaultVersion)} title="Edit in pool"
+                          aria-label="Edit in pool">
                     <PencilIcon className="pool-action-icon" />
                   </button>
                   <button className="pool-action-btn pool-action-btn-danger" type="button"
-                          onClick={() => setConfirmDeleteId('task')} title="Delete task">
+                          onClick={() => setConfirmDeleteId('task')} title="Delete task"
+                          aria-label="Delete task">
                     <TrashIcon className="pool-action-icon" />
                   </button>
                 </div>
@@ -472,12 +475,13 @@ function TaskRow({ task, insertedVersionMap, activeTaskItem, activeRowRef, onTog
                         </div>
                         <div className="pool-version-actions">
                           <button className="pool-action-btn" type="button"
-                                  onClick={() => startEdit(v)} title="Edit in pool" disabled={busy}>
+                                  onClick={() => startEdit(v)} title="Edit in pool"
+                                  aria-label="Edit in pool" disabled={busy}>
                             <PencilIcon className="pool-action-icon" />
                           </button>
                           <button className="pool-action-btn pool-action-btn-danger" type="button"
                                   onClick={() => { setConfirmDeleteId(vIdStr); setEditingVersionId(null); }}
-                                  title="Delete version" disabled={busy}>
+                                  title="Delete version" aria-label="Delete version" disabled={busy}>
                             <TrashIcon className="pool-action-icon" />
                           </button>
                         </div>

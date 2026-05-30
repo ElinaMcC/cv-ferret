@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import AssemblyEditor          from './AssemblyEditor.jsx';
 import AssemblyToolbar         from './AssemblyToolbar.jsx';
 import PoolDrawer              from './PoolDrawer.jsx';
@@ -462,6 +463,8 @@ function SaveAsCvModal({ currentTitle, currentProfileId, profiles, onConfirm, on
   const [title,     setTitle]     = useState(currentTitle);
   const [profileId, setProfileId] = useState(currentProfileId ?? '');
   const [saving,    setSaving]    = useState(false);
+  const ref = useRef(null);
+  useFocusTrap(true, ref);
 
   async function handleSubmit() {
     if (!title.trim() || saving) return;
@@ -472,8 +475,9 @@ function SaveAsCvModal({ currentTitle, currentProfileId, profiles, onConfirm, on
 
   return (
     <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && onClose()}>
-      <div className="asm-dialog" role="dialog" aria-modal="true" aria-label="Save as new draft">
-        <h2 className="asm-dialog-title">Save as new draft</h2>
+      <div className="asm-dialog" role="dialog" aria-modal="true"
+           aria-labelledby="save-as-title" ref={ref}>
+        <h2 className="asm-dialog-title" id="save-as-title">Save as new draft</h2>
         <p className="asm-dialog-body">
           Creates a new CV with the current content. The original draft is left unchanged.
         </p>
@@ -543,6 +547,8 @@ function jobLabel(job) {
 }
 
 function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
+  const ref = useRef(null);
+  useFocusTrap(true, ref);
   const [jobs,      setJobs]      = useState([]);
   const [decisions, setDecisions] = useState(
     items.map(item => ({
@@ -603,8 +609,8 @@ function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
   return (
     <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && onClose()}>
       <div className="asm-dialog asm-dialog-wide" role="dialog" aria-modal="true"
-           aria-label="Save as building blocks">
-        <h2 className="asm-dialog-title">Save as building blocks?</h2>
+           aria-labelledby="bb-dialog-title" ref={ref}>
+        <h2 className="asm-dialog-title" id="bb-dialog-title">Save as building blocks?</h2>
         <p className="asm-dialog-body">
           {items.length === 1
             ? 'This bullet isn\'t in your experience pool yet.'
@@ -711,10 +717,13 @@ function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
 // ── NavGuardDialog ────────────────────────────────────────────────────────────
 
 function NavGuardDialog({ onSaveAndLeave, onDiscard, onStay }) {
+  const ref = useRef(null);
+  useFocusTrap(true, ref);
   return (
-    <div className="asm-dialog-overlay">
-      <div className="asm-dialog" role="alertdialog" aria-modal="true">
-        <h2 className="asm-dialog-title">Unsaved changes</h2>
+    <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && onStay()}>
+      <div className="asm-dialog" role="alertdialog" aria-modal="true"
+           aria-labelledby="nav-guard-title" ref={ref}>
+        <h2 className="asm-dialog-title" id="nav-guard-title">Unsaved changes</h2>
         <p className="asm-dialog-body">
           You have changes that haven't been saved yet. What would you like to do?
         </p>
