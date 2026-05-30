@@ -173,6 +173,23 @@ export const generationAPI = {
 export const importAPI = {
   importExperience: (jobs) => api.request('POST', '/import/experience', { jobs }),
   importEducation: (data) => api.request('POST', '/import/education', data),
+
+  extractText: async (file) => {
+    const form = new FormData();
+    form.append('file', file);
+    const response = await fetch(`${API_BASE}/import/extract-text`, { method: 'POST', body: form });
+    const text = await response.text();
+    if (!response.ok) {
+      let message;
+      try { message = JSON.parse(text).error; } catch { message = text || response.statusText; }
+      throw new Error(message);
+    }
+    return JSON.parse(text);
+  },
+
+  extractWithAI: (cvText) => api.request('POST', '/import/extract-with-ai', { cvText }),
+
+  importAll: (data) => api.request('POST', '/import/import-all', data),
 };
 
 export const dashboardAPI = {

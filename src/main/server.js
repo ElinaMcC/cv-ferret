@@ -73,6 +73,7 @@ app.use('/api', require('./routes/documents'));
 app.use('/api', require('./routes/cvDocuments'));
 app.use('/api', require('./routes/profiles'));
 app.use('/api', require('./routes/importExport'));
+app.use('/api', require('./routes/import'));
 
 // ── Catch-all: serve the React app for any non-API route (must be last) ───────
 

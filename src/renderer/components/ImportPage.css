@@ -1,0 +1,461 @@
+@import '../styles/shared.css';
+
+.ip-page {
+  padding: 28px 32px;
+  max-width: 720px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────────── */
+
+.ip-header {
+  margin-bottom: 24px;
+}
+
+.ip-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 6px;
+}
+
+.ip-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ── Input card ──────────────────────────────────────────────────────────────── */
+
+.ip-input-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Drop zone ───────────────────────────────────────────────────────────────── */
+
+.ip-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.ip-dropzone:hover,
+.ip-dropzone:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--bg-secondary);
+  outline: none;
+}
+
+.ip-dropzone--drag {
+  border-color: var(--color-primary);
+  background: var(--color-info-bg);
+}
+
+.ip-dropzone--ready {
+  border-style: solid;
+  border-color: var(--color-success-border);
+  background: var(--color-success-bg);
+}
+
+.ip-dropzone-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--text-muted);
+}
+
+.ip-dropzone-msg {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.ip-dropzone-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.ip-dropzone-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.ip-dropzone-ready {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-success-text);
+  font-weight: 500;
+}
+
+.ip-dropzone-tick {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.ip-dropzone-clear {
+  background: none;
+  border: none;
+  color: var(--color-success-text);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.7;
+}
+.ip-dropzone-clear:hover { opacity: 1; }
+
+.ip-file-hidden {
+  display: none;
+}
+
+/* ── Or divider ──────────────────────────────────────────────────────────────── */
+
+.ip-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.ip-or::before,
+.ip-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Paste textarea ──────────────────────────────────────────────────────────── */
+
+.ip-paste {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.ip-paste:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+/* ── PII notice ──────────────────────────────────────────────────────────────── */
+
+.ip-pii-notice {
+  font-size: 12.5px;
+  color: var(--color-info-text);
+  background: var(--color-info-bg);
+  border-radius: 4px;
+  padding: 8px 12px;
+  line-height: 1.5;
+}
+
+/* ── Errors & hints ──────────────────────────────────────────────────────────── */
+
+.ip-error {
+  font-size: 13px;
+  color: var(--color-error-text);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  line-height: 1.5;
+}
+
+.ip-success {
+  font-size: 13px;
+  color: var(--color-success-text);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.ip-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.ip-input-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ── Extracting spinner ──────────────────────────────────────────────────────── */
+
+.ip-extracting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 32px;
+}
+
+.ip-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: ip-spin 0.8s linear infinite;
+}
+
+@keyframes ip-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ip-extracting-msg {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.ip-extracting-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Success screen ──────────────────────────────────────────────────────────── */
+
+.ip-done-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 480px;
+}
+
+.ip-done-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-success-bg);
+  border: 2px solid var(--color-success-border);
+  color: var(--color-success-text);
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ip-done-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.ip-done-summary {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ip-done-summary li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ip-done-summary li::before {
+  content: '✓';
+  color: var(--color-success-text);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ip-done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* ── Back button ─────────────────────────────────────────────────────────────── */
+
+.ip-back {
+  align-self: flex-start;
+  margin-bottom: 4px;
+}
+
+/* ── Path tiles ──────────────────────────────────────────────────────────────── */
+
+.ip-path-tiles {
+  display: flex;
+  gap: 16px;
+}
+
+.ip-path-tile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 24px 22px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ip-path-tile:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.12);
+}
+
+.ip-path-tile--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ip-path-tile-icon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-primary);
+}
+
+.ip-path-tile--disabled .ip-path-tile-icon {
+  color: var(--text-muted);
+}
+
+.ip-path-tile-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.ip-path-tile-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.ip-path-tile-disabled-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Manual path ─────────────────────────────────────────────────────────────── */
+
+.ip-manual {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ip-manual-step {
+  display: flex;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+
+.ip-manual-step-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.ip-manual-step-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ip-manual-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.ip-manual-step-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.ip-manual-step-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ip-template-btn {
+  align-self: flex-start;
+}
+
+/* ── Manual JSON import ──────────────────────────────────────────────────────── */
+
+.ip-manual-json {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ip-manual-json-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.ip-file-input {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.ip-manual-json-ready {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.ip-manual-json-summary {
+  font-size: 13px;
+  color: var(--color-success-text);
+  flex: 1;
+}

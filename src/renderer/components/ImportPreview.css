@@ -1,0 +1,448 @@
+@import '../styles/shared.css';
+
+.ipr-page {
+  padding: 0 32px 40px;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────────────────── */
+
+.ipr-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0 20px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-app);
+  z-index: 10;
+  border-bottom: 1px solid var(--border-light);
+  margin-bottom: 16px;
+}
+
+.ipr-topbar-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.ipr-intro {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.ipr-error {
+  font-size: 13px;
+  color: var(--color-error-text);
+  background: var(--color-error-bg);
+  border: 1px solid var(--color-error-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+/* ── Sections ────────────────────────────────────────────────────────────────── */
+
+.ipr-section {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.ipr-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.ipr-section-header:hover { background: var(--bg-secondary); }
+
+.ipr-chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.ipr-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+  flex: 1;
+}
+
+.ipr-badge {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+.ipr-section-body {
+  padding: 16px 18px 20px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ipr-section-note {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.ipr-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* ── Shared input ────────────────────────────────────────────────────────────── */
+
+.ipr-input {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: border-color 0.15s;
+}
+.ipr-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.ipr-field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.ipr-field-hint {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* ── Personal details — comparison layout ────────────────────────────────────── */
+
+.ipr-personal-grid {
+  display: grid;
+  grid-template-columns: 100px 1fr 1fr;
+  gap: 6px 12px;
+  align-items: center;
+}
+
+.ipr-personal-col-head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* Span column heads across the right two columns */
+.ipr-personal-col-head:first-child {
+  grid-column: 2;
+}
+.ipr-personal-col-head:last-child {
+  grid-column: 3;
+}
+
+.ipr-personal-row {
+  display: contents;
+}
+
+.ipr-personal-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.ipr-personal-current {
+  font-size: 13px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 0;
+}
+
+.ipr-personal-overwrite {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: var(--color-warning-bg);
+  border-radius: 4px;
+}
+
+.ipr-personal-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Jobs ────────────────────────────────────────────────────────────────────── */
+
+.ipr-job {
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ipr-job-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.ipr-job-header:hover { background: var(--bg-secondary); }
+
+.ipr-job-title {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ipr-job-dates {
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.ipr-job-body {
+  padding: 14px 14px 16px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ipr-job-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 12px;
+}
+
+.ipr-job-notes {
+  font-size: 12.5px;
+  color: var(--color-warning-text);
+  background: var(--color-warning-bg);
+  border-radius: 4px;
+  padding: 8px 10px;
+  line-height: 1.5;
+}
+
+/* ── Tasks ───────────────────────────────────────────────────────────────────── */
+
+.ipr-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ipr-tasks-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ipr-task {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.ipr-task-input {
+  flex: 1;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.15s;
+}
+.ipr-task-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.ipr-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--text-muted);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.ipr-delete-btn:hover {
+  color: var(--color-error-text);
+  background: var(--color-error-bg);
+}
+
+.ipr-delete-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.ipr-delete-job {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  align-self: flex-start;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.ipr-delete-job:hover {
+  color: var(--color-error-text);
+  border-color: var(--color-error-border);
+  background: var(--color-error-bg);
+}
+
+/* ── Education / Training ────────────────────────────────────────────────────── */
+
+.ipr-edu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ipr-edu-group-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ipr-edu-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ipr-edu-fields {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.ipr-edu-fields .ipr-input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.ipr-date-short {
+  max-width: 110px;
+  flex: 0 0 110px !important;
+}
+
+/* ── Skills ──────────────────────────────────────────────────────────────────── */
+
+.ipr-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.ipr-skill-chip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 4px 2px 8px;
+}
+
+.ipr-skill-input {
+  border: none;
+  background: none;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: inherit;
+  width: 100px;
+  padding: 2px 0;
+}
+.ipr-skill-input:focus { outline: none; }
+
+/* ── Languages ───────────────────────────────────────────────────────────────── */
+
+.ipr-lang-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ipr-level-select {
+  max-width: 140px;
+  flex: 0 0 140px;
+}
+
+/* ── Bottom bar ──────────────────────────────────────────────────────────────── */
+
+.ipr-bottom-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 8px;
+  align-items: flex-start;
+}
