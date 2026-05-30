@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { marked } from 'marked';
 import { profileAPI, cvDocumentAPI, documentAPI } from '../../services/ipc.js';
 
 // Three ways to start a new CV:
@@ -39,6 +40,8 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
   const [profiles, setProfiles]       = useState([]);
   const [cvDocuments, setCvDocuments] = useState([]);
   const [selectedCvId, setSelectedCvId] = useState('');
+  const [markdownHtml, setMarkdownHtml] = useState('');
+  const [markdownFileName, setMarkdownFileName] = useState('');
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
   const titleRef = useRef(null);
@@ -64,7 +67,9 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
   // Profile to associate the new document with (from CV Library context).
   const preselectedProfile = profiles.find(p => String(p.id) === String(preselectedProfileId));
 
-  const canCreate = title.trim() && (mode !== 'existing' || selectedCvId);
+  const canCreate = title.trim() &&
+    (mode !== 'existing' || selectedCvId) &&
+    (mode !== 'markdown' || markdownHtml);
 
   // CVs grouped for the optgroup dropdown.
   const profilesWithDocs = profiles.filter(p => cvDocuments.some(d => d.profile_id === p.id));
@@ -92,6 +97,9 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
       } else if (mode === 'existing') {
         const sourceDoc = await cvDocumentAPI.get(parseInt(selectedCvId));
         contentHtml = sourceDoc.content_html || '';
+
+      } else if (mode === 'markdown') {
+        contentHtml = markdownHtml;
       }
 
       const { id } = await cvDocumentAPI.create({
@@ -106,6 +114,14 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
     } finally {
       setLoading(false);
     }
+  }
+
+  async function handleMarkdownFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMarkdownFileName(file.name);
+    const text = await file.text();
+    setMarkdownHtml(marked.parse(text));
   }
 
   function handleKeyDown(e) {
@@ -156,7 +172,30 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
             disabled={cvDocuments.length === 0}
             disabledHint="No CVs yet — create one first using scratch or defaults."
           />
+          <ModeCard
+            id="markdown"
+            selected={mode === 'markdown'}
+            onSelect={() => setMode('markdown')}
+            title="Load from Markdown"
+            description="Import a CV written in Markdown — useful for agent-generated drafts."
+          />
         </div>
+
+        {/* Markdown file picker */}
+        {mode === 'markdown' && (
+          <label className="asm-dialog-label">
+            Markdown file
+            <input
+              type="file"
+              accept=".md,.txt"
+              className="asm-dialog-file-input"
+              onChange={handleMarkdownFile}
+            />
+            {markdownFileName && (
+              <span className="asm-dialog-hint">✓ {markdownFileName}</span>
+            )}
+          </label>
+        )}
 
         {/* CV picker: shown in existing mode, grouped by profile */}
         {mode === 'existing' && cvDocuments.length > 0 && (

@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import {
   DocumentArrowDownIcon, DocumentDuplicateIcon,
   SparklesIcon, Bars3Icon, CheckIcon, LinkIcon,
@@ -6,6 +7,46 @@ import {
 import { useAssemblyStore } from '../../stores/assemblyStore.js';
 import { usePoolStore }     from '../../stores/poolStore.js';
 import { useAIStore }       from '../../stores/aiStore.js';
+
+function ExportDropdown({ onExport }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [open]);
+
+  function select(format) {
+    setOpen(false);
+    onExport(format);
+  }
+
+  return (
+    <div className="asm-export-dropdown" ref={ref}>
+      <button
+        className="btn btn-ghost btn-sm btn-with-icon"
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onKeyDown={e => e.key === 'Escape' && setOpen(false)}
+      >
+        <DocumentArrowDownIcon className="icon" /> Export
+      </button>
+      {open && (
+        <div className="asm-export-menu" role="menu">
+          <button role="menuitem" onClick={() => select('md')}>Markdown (.md)</button>
+          <button role="menuitem" onClick={() => select('docx')}>Word (.docx)</button>
+          <button role="menuitem" onClick={() => select('pdf')}>PDF (.pdf)</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Formatting toolbar ────────────────────────────────────────────────────────
 
@@ -71,8 +112,7 @@ export default function AssemblyToolbar({
   editor,
   onSave,
   onSaveAs,
-  onExportPdf,
-  onExportDocx,
+  onExport,
   onLinkToApp,
   onProfileChange,
   profiles = [],
@@ -134,13 +174,7 @@ export default function AssemblyToolbar({
             <DocumentDuplicateIcon className="icon" /> Save as
           </button>
 
-          <button className="btn btn-ghost btn-sm btn-with-icon" onClick={onExportDocx} title="Export as DOCX">
-            <DocumentArrowDownIcon className="icon" /> DOCX
-          </button>
-
-          <button className="btn btn-ghost btn-sm btn-with-icon" onClick={onExportPdf} title="Export as PDF">
-            <DocumentArrowDownIcon className="icon" /> PDF
-          </button>
+          <ExportDropdown onExport={onExport} />
 
           <button
             className={`btn btn-ghost btn-sm btn-with-icon${drawerOpen ? ' active-toggle' : ''}`}

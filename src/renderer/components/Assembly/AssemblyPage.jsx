@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import TurndownService from 'turndown';
 import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 import AssemblyEditor          from './AssemblyEditor.jsx';
 import AssemblyToolbar         from './AssemblyToolbar.jsx';
@@ -302,8 +303,25 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
 
   async function handleExport(format) {
     if (!documentId || exporting) return;
-    // Flush the autosave debounce so the backend exports the latest content.
     await editorRef.current?.flushSave();
+
+    if (format === 'md') {
+      const html = editorRef.current?.getHTML() ?? '';
+      const td = new TurndownService({ headingStyle: 'atx', bulletListMarker: '-' });
+      const markdown = td.turndown(html);
+      const safeTitle = (title || 'CV').replace(/[\\/:*?"<>|]/g, '-');
+      const blob = new Blob([markdown], { type: 'text/markdown; charset=utf-8' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `${safeTitle}.md`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Exported as Markdown');
+      return;
+    }
 
     setExporting(true);
     try {
@@ -422,8 +440,7 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
             editor={editorInstance}
             onSave={handleSave}
             onSaveAs={() => setShowSaveAsModal(true)}
-            onExportPdf={() => handleExport('pdf')}
-            onExportDocx={() => handleExport('docx')}
+            onExport={handleExport}
             onLinkToApp={() => setShowLinkModal(true)}
             onProfileChange={handleProfileChange}
             profiles={profiles}
