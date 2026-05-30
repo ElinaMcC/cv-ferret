@@ -9,17 +9,25 @@ import './ApplicationTracker.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const STATUSES = ['Saved', 'Applied', 'Interviewing', 'Offer', 'Closed'];
+const STATUSES = ['unprocessed', 'applied', 'interviewing', 'offer', 'closed'];
 
-const STATUS_COLORS = {
-  Saved:        { bg: '#f0f0f0', text: '#555' },
-  Applied:      { bg: '#dbeafe', text: '#1d4ed8' },
-  Interviewing: { bg: '#fef3c7', text: '#92400e' },
-  Offer:        { bg: '#dcfce7', text: '#166534' },
-  Closed:       { bg: '#f3f4f6', text: '#374151' },
+const STATUS_LABELS = {
+  unprocessed:  'Unprocessed',
+  applied:      'Applied',
+  interviewing: 'Interviewing',
+  offer:        'Offer',
+  closed:       'Closed',
 };
 
-const STATUSES_WITH_DATE = ['Applied', 'Interviewing', 'Offer', 'Closed'];
+const STATUS_COLORS = {
+  unprocessed:  { bg: '#f0f0f0', text: '#555' },
+  applied:      { bg: '#dbeafe', text: '#1d4ed8' },
+  interviewing: { bg: '#fef3c7', text: '#92400e' },
+  offer:        { bg: '#dcfce7', text: '#166534' },
+  closed:       { bg: '#f3f4f6', text: '#374151' },
+};
+
+const STATUSES_WITH_DATE = ['applied', 'interviewing', 'offer', 'closed'];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -39,7 +47,7 @@ function emptyForm() {
     job_title:      '',
     url:            '',
     job_ad_text:    '',
-    status:         'Saved',
+    status:         'unprocessed',
     cv_document_id: null,
     reference_ids:  [],
     notes:          [],
@@ -53,7 +61,7 @@ function StatusBadge({ status }) {
   const colors = STATUS_COLORS[status] || { bg: '#eee', text: '#555' };
   return (
     <span className="at-status-badge" style={{ background: colors.bg, color: colors.text }}>
-      {status}
+      {STATUS_LABELS[status] || status}
     </span>
   );
 }
@@ -449,13 +457,14 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
         <div className="at-status-tabs">
           {['All', ...STATUSES].map(s => {
             const count = s === 'All' ? applications.length : applications.filter(a => a.status === s).length;
+            const label = s === 'All' ? 'All' : STATUS_LABELS[s];
             return (
               <button
                 key={s}
                 className={`at-status-tab ${filterStatus === s ? 'active' : ''}`}
                 onClick={() => setFilterStatus(s)}
               >
-                {s} <span className="at-tab-count">{count}</span>
+                {label} <span className="at-tab-count">{count}</span>
               </button>
             );
           })}
@@ -471,7 +480,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
         <div className="at-list">
           {filtered.length === 0 && (
             <p className="at-list-empty">
-              {filterStatus === 'All' ? 'No applications yet.' : `No "${filterStatus}" applications.`}
+              {filterStatus === 'All' ? 'No applications yet.' : `No "${STATUS_LABELS[filterStatus] || filterStatus}" applications.`}
             </p>
           )}
           {filtered.map(app => (
@@ -609,7 +618,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
                     color: STATUS_COLORS[form.status]?.text || '#333',
                   }}
                 >
-                  {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                  {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
                 </select>
 
                 {selectedId === 'new' ? (

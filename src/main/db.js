@@ -124,6 +124,16 @@ function initializeDatabase(userDataPath) {
         if (a.cv_document_id === undefined) a.cv_document_id = null;
       });
 
+      // Migrate: normalise status values from old English display strings to
+      // language-neutral codes. Keeps existing data valid after the i18n refactor.
+      const STATUS_CODE_MAP = {
+        'Saved': 'unprocessed', 'Applied': 'applied',
+        'Interviewing': 'interviewing', 'Offer': 'offer', 'Closed': 'closed',
+      };
+      data.applications.forEach(a => {
+        if (STATUS_CODE_MAP[a.status]) a.status = STATUS_CODE_MAP[a.status];
+      });
+
       // Ensure all jobs have a location field
       data.jobs.forEach(j => { if (j.location === undefined) j.location = ''; });
 

@@ -21,3 +21,12 @@ When touching AI-related code (`src/main/routes/ai.js`, `aiChat.js`, `piiUtils.j
 
 ## Language
 Plain JavaScript. Do not introduce TypeScript.
+
+## Localisation
+There are no current plans to translate this app. If a contributor wants to add translations in the future, here is what they need to know:
+
+- **Status codes** — application statuses are stored as language-neutral lowercase codes (`unprocessed`, `applied`, `interviewing`, `offer`, `closed`). Display labels live in `STATUS_LABELS` in `ApplicationTracker.jsx`. Do not store display strings in data.
+- **UI strings** — all other strings are inline in JSX. A translation effort would need to extract them to JSON files and introduce a library such as `react-i18next`.
+- **Date formatting** — `formatDate()` in `ApplicationTracker.jsx` uses a hardcoded `en-GB` locale. The `cvLocale` setting in `db.js` covers CV export dates only.
+- **Plurals** — several strings handle plurals inline (e.g. `count !== 1 ? 's' : ''`). An i18n library handles this properly for other languages.
+- **AI responses** — the AI is prompted in English in `src/main/routes/ai.js` and `aiChat.js`. Translating the UI would not affect the language the AI responds in; that is a separate, harder problem.
