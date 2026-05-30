@@ -7,15 +7,28 @@ const samplesCache = require('../styleSamplesCache.js');
 
 const router = Router();
 
+// Guards both conditions: AI must be enabled AND an API key must be present.
+// Returns true if the request can proceed; writes the error response and
+// returns false if not. Call as: if (!requireAI(settings, res)) return;
+function requireAI(settings, res) {
+  if (settings.aiEnabled === false) {
+    res.status(403).json({ error: 'AI features are disabled. Enable them in Settings.' });
+    return false;
+  }
+  if (!settings.anthropicApiKey) {
+    res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
+    return false;
+  }
+  return true;
+}
+
 // ── CV Assembly analysis ──────────────────────────────────────────────────────
 
 router.post('/cv-assembly/analyse', async (req, res) => {
   try {
     const { jobAd } = req.body;
     const settings = db.getSettings();
-    if (!settings.anthropicApiKey) {
-      return res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
-    }
+    if (!requireAI(settings, res)) return;
 
     // Build a compact pool: default version gets full detail; alt versions get
     // role priorities only (Claude picks by role match, not by reading every word).
@@ -113,9 +126,7 @@ router.post('/cover-letter/generate', async (req, res) => {
   try {
     const { applicationId, style } = req.body;
     const settings = db.getSettings();
-    if (!settings.anthropicApiKey) {
-      return res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
-    }
+    if (!requireAI(settings, res)) return;
 
     const application = db.getApplication(parseInt(applicationId));
     if (!application) return res.status(404).json({ error: 'Application not found.' });
@@ -225,9 +236,7 @@ router.post('/generate-versions', async (req, res) => {
   try {
     const { taskId, description, jobTitle, tags } = req.body;
     const settings = db.getSettings();
-    if (!settings.anthropicApiKey) {
-      return res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
-    }
+    if (!requireAI(settings, res)) return;
 
     const task = db.getTaskWithVersions(taskId);
     if (!task) return res.status(404).json({ error: 'Task not found' });
@@ -251,9 +260,7 @@ router.post('/generate-versions', async (req, res) => {
 router.post('/generate-versions-batch', async (req, res) => {
   try {
     const settings = db.getSettings();
-    if (!settings.anthropicApiKey) {
-      return res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
-    }
+    if (!requireAI(settings, res)) return;
 
     const jobs = db.getAllJobs();
     let processed = 0, skipped = 0;

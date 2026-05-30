@@ -7,6 +7,18 @@ const { buildReplacementMap, stripPII } = require('../piiUtils.js');
 
 const router = Router();
 
+function requireAI(settings, res) {
+  if (settings.aiEnabled === false) {
+    res.status(403).json({ error: 'AI features are disabled. Enable them in Settings.' });
+    return false;
+  }
+  if (!settings.anthropicApiKey) {
+    res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
+    return false;
+  }
+  return true;
+}
+
 // POST /api/ai/chat
 //
 // Stateless conversational AI endpoint. The client sends the full conversation
@@ -31,9 +43,7 @@ const router = Router();
 router.post('/ai/chat', async (req, res) => {
   try {
     const settings = db.getSettings();
-    if (!settings.anthropicApiKey) {
-      return res.status(400).json({ error: 'No API key configured. Add your Anthropic API key in Settings.' });
-    }
+    if (!requireAI(settings, res)) return;
 
     const { messages = [], jobAd = '', documentStructure = '', persona = '' } = req.body;
 

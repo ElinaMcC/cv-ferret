@@ -16,6 +16,11 @@ These are intentional — do not suggest replacing them unprompted:
 ## Icons
 Use **Heroicons** (`@heroicons/react`) exclusively. Do not introduce other icon libraries.
 
+## AI route guard
+Every backend route that calls the Anthropic API must check **both** `aiEnabled` and `anthropicApiKey` before proceeding. Use the `requireAI(settings, res)` helper pattern already established in `routes/ai.js` and `routes/aiChat.js`. Checking the API key alone is not sufficient — a disabled toggle must be honoured server-side, not just in the UI.
+
+The one deliberate exception is the Import page's AI extraction route, where PII stripping is also intentionally omitted (documented separately).
+
 ## PII awareness
 When touching AI-related code (`src/main/routes/ai.js`, `aiChat.js`, `piiUtils.js`), always consider whether personal data could be exposed. The established pattern is `piiUtils.js` stripping before every AI call — maintain this.
 
