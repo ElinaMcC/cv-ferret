@@ -1,0 +1,166 @@
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────────────── */
+
+.sidebar {
+  width: 200px;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  transition: width 0.2s ease;
+  overflow: hidden;
+}
+
+.sidebar.collapsed {
+  width: 56px;
+}
+
+/* Logo */
+.sidebar-logo {
+  display: block;
+  width: 120px;
+  height: auto;
+  margin: 0 auto 12px;
+  flex-shrink: 0;
+}
+
+.sidebar-logo-icon {
+  display: block;
+  width: 32px;
+  height: auto;
+  margin: 0 auto 12px;
+  flex-shrink: 0;
+}
+
+/* Nav item group */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+}
+
+/* Shared nav button base */
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: none;
+  background-color: transparent;
+  color: var(--sidebar-text);
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 13.5px;
+  transition: background-color 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-btn:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.nav-btn.active {
+  background-color: var(--sidebar-active);
+  font-weight: 600;
+}
+
+/* Collapsed: centre icon */
+.sidebar.collapsed .nav-btn {
+  justify-content: center;
+  padding: 9px;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Footer (collapse toggle + theme) */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--sidebar-hover);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.collapse-toggle {
+  color: var(--sidebar-text);
+  opacity: 0.7;
+}
+
+.collapse-toggle:hover {
+  opacity: 1;
+}
+
+.theme-btn {
+  font-size: 12.5px;
+}
+
+/* ── Main content ───────────────────────────────────────────────────────────── */
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  min-width: 0; /* prevent flex child from overflowing */
+}
+
+/* ── Toast notifications ────────────────────────────────────────────────────── */
+
+@keyframes toast-show {
+  0%   { opacity: 0; transform: translateY(6px); }
+  12%  { opacity: 1; transform: translateY(0); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes toast-show-error {
+  0%   { opacity: 0; transform: translateY(6px); }
+  6%   { opacity: 1; transform: translateY(0); }
+  85%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 10px 18px;
+  background: #1a1a1a;
+  color: white;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 9999;
+  pointer-events: none;
+  animation: toast-show 2s ease forwards;
+}
+
+.toast.toast-error {
+  background: #8b1a1a;
+  animation: toast-show-error 6s ease forwards;
+}

@@ -1,0 +1,60 @@
+{
+  "name": "cv-ferret",
+  "productName": "CV Ferret",
+  "version": "1.0.0",
+  "description": "Personal CV Builder",
+  "main": "src/main/server.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:react\" \"npm run dev:server\"",
+    "dev:react": "vite",
+    "dev:server": "wait-on http://localhost:5173 && node src/main/server.js",
+    "build": "vite build",
+    "start": "cross-env NODE_ENV=production node src/main/server.js",
+    "preview": "vite preview",
+    "start:fresh": "cross-env APPDATA=test-profile npm start",
+    "package:win": "npm run build && pkg src/main/server.js --icon installer/icon.ico --targets node18-win-x64 --output release/cv-ferret.exe && node scripts/package-win.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/pdfkit/js/data/**",
+      "node_modules/pdfkit/js/font/**"
+    ],
+    "scripts": [
+      "src/main/exportHelpers.js"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ]
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
+    "@heroicons/react": "^2.2.0",
+    "@tiptap/react": "^3.23.4",
+    "@tiptap/starter-kit": "^3.23.4",
+    "docx": "^9.6.1",
+    "express": "^4.18.2",
+    "htmlparser2": "^12.0.0",
+    "mammoth": "^1.12.0",
+    "multer": "^2.1.1",
+    "pdfkit": "^0.18.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-rnd": "^10.5.3",
+    "uuid": "^9.0.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/ui": "^4.1.7",
+    "@yao-pkg/pkg": "^6.14.2",
+    "concurrently": "^8.2.2",
+    "cross-env": "^10.1.0",
+    "vite": "^5.0.10",
+    "vitest": "^4.1.7",
+    "wait-on": "^7.0.1"
+  },
+  "author": "Elina McCafferty"
+}

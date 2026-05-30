@@ -1,0 +1,119 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Light theme (default) ───────────────────────────────────────────────────── */
+
+:root {
+  --bg-app:        #f5f5f5;
+  --bg-card:       #ffffff;
+  --bg-secondary:  #f8f9fa;
+  --bg-tertiary:   #f0f0f0;
+  --bg-hover:      #e8e8e8;
+
+  --text-primary:  #1a1a1a;
+  --text-secondary:#555555;
+  --text-muted:    #888888;
+  --text-heading:  #2c3e50;
+
+  --border:        #dddddd;
+  --border-light:  #e8e8e8;
+
+  --sidebar-bg:    #2c3e50;
+  --sidebar-text:  #ffffff;
+  --sidebar-hover: #34495e;
+  --sidebar-active:#3498db;
+
+  --color-primary:       #3498db;
+  --color-primary-hover: #2980b9;
+  --color-secondary:     #95a5a6;
+  --color-secondary-hover:#7f8c8d;
+
+  --color-success-bg:    #dcfce7;
+  --color-success-text:  #166534;
+  --color-success-border:#bbf7d0;
+  --color-error-bg:      #fee2e2;
+  --color-error-text:    #dc2626;
+  --color-error-border:  #fecaca;
+  --color-warning-bg:    #fef3c7;
+  --color-warning-text:  #92400e;
+  --color-info-bg:       #dbeafe;
+  --color-info-text:     #1d4ed8;
+
+  /* CV preview is always white regardless of theme */
+  --cv-bg:   #ffffff;
+  --cv-text: #111111;
+}
+
+/* ── Dark theme ──────────────────────────────────────────────────────────────── */
+
+html.dark {
+  --bg-app:        #0f1117;
+  --bg-card:       #1a1d27;
+  --bg-secondary:  #20232e;
+  --bg-tertiary:   #252836;
+  --bg-hover:      #2e3248;
+
+  --text-primary:  #e4e6f0;
+  --text-secondary:#9aa0bb;
+  --text-muted:    #636b8a;
+  --text-heading:  #c8d0ea;
+
+  --border:        #2e3346;
+  --border-light:  #252836;
+
+  --sidebar-bg:    #12151f;
+  --sidebar-text:  #c0c8e0;
+  --sidebar-hover: #1e2130;
+  --sidebar-active:#3498db;
+
+  --color-primary:       #3498db;
+  --color-primary-hover: #2980b9;
+  --color-secondary:     #3d4558;
+  --color-secondary-hover:#4a5268;
+
+  --color-success-bg:    #0d2117;
+  --color-success-text:  #4ade80;
+  --color-success-border:#166534;
+  --color-error-bg:      #2d0f0f;
+  --color-error-text:    #f87171;
+  --color-error-border:  #7f1d1d;
+  --color-warning-bg:    #2d1e05;
+  --color-warning-text:  #fcd34d;
+  --color-info-bg:       #0f1e3d;
+  --color-info-text:     #93c5fd;
+
+  --cv-bg:   #ffffff;
+  --cv-text: #111111;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+}
+
+/* Ensure native form elements pick up the active theme */
+input, select, textarea {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 1;
+}
+
+/* ── Themed scrollbars (WebKit/Chromium) ─────────────────────────────────────── */
+::-webkit-scrollbar              { width: 7px; height: 7px; }
+::-webkit-scrollbar-track        { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb        { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover  { background: var(--text-muted); }
+::-webkit-scrollbar-corner       { background: var(--bg-secondary); }

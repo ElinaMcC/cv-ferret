@@ -1,0 +1,183 @@
+@import '../styles/shared.css';
+
+.reference-page {
+  padding: 20px;
+  max-width: 800px;
+}
+
+.reference-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.reference-header h1 {
+  flex: 1;
+  margin: 0;
+  color: var(--text-heading);
+}
+
+.ref-error {
+  padding: 12px;
+  background: var(--color-error-bg);
+  border-left: 4px solid #f00;
+  border-radius: 4px;
+  color: var(--color-error-text);
+  margin-bottom: 16px;
+}
+
+.ref-empty {
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 20px 0;
+}
+
+.references-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card */
+.reference-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px;
+}
+
+.reference-file-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.reference-filename {
+  flex: 1;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--color-primary);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reference-filename:hover { text-decoration: underline; }
+
+.ref-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+/* Fields */
+.reference-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.ref-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.ref-form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.ref-form-group input,
+.ref-form-group select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg-card);
+}
+
+.ref-form-group input:focus,
+.ref-form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+/* Tags */
+.ref-tag-row {
+  display: flex;
+  gap: 8px;
+}
+
+.ref-tag-row input { flex: 1; }
+
+.ref-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.ref-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.tag-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #1976d2;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+
+.tag-remove-btn:hover { opacity: 0.7; }
+
+/* Footer */
+.reference-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--bg-tertiary);
+}
+
+.ref-saved {
+  font-size: 13px;
+  color: var(--color-success-text);
+}
+
+/* Icon buttons (local) */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: all 0.15s;
+}
+.icon-btn:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+.icon-btn.delete-btn:hover { background: var(--color-error-bg); color: #e74c3c; }
+.icon-btn .icon { width: 16px; height: 16px; }

@@ -1,0 +1,631 @@
+import { useState, useEffect, useRef } from 'react';
+import {
+  PlusIcon, PencilIcon, TrashIcon, StarIcon,
+  FolderOpenIcon, DocumentDuplicateIcon, ArrowTopRightOnSquareIcon,
+  ChatBubbleBottomCenterTextIcon,
+} from '@heroicons/react/24/outline';
+import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
+import { profileAPI, cvDocumentAPI } from '../services/ipc.js';
+import { useToast } from '../contexts/ToastContext.jsx';
+import '../styles/shared.css';
+import './CVLibrary.css';
+
+const SELECTED_KEY = 'cvlib_selectedProfileId';
+
+const UNORGANISED = 'unorganised'; // sentinel — not a real profile ID
+
+// Persist and restore which profile (or 'unorganised') is selected so
+// navigating away and back keeps the user on the same panel.
+function readStoredId() {
+  const v = sessionStorage.getItem(SELECTED_KEY);
+  if (!v) return null;
+  if (v === UNORGANISED) return UNORGANISED;
+  const n = parseInt(v);
+  return isNaN(n) ? null : n;
+}
+function storeId(id) {
+  if (id != null) sessionStorage.setItem(SELECTED_KEY, String(id));
+  else sessionStorage.removeItem(SELECTED_KEY);
+}
+
+export default function CVLibrary({ onNavigate }) {
+  const [profiles, setProfiles]           = useState([]);
+  const [cvDocuments, setCvDocuments]     = useState([]);
+  const [selectedId, setSelectedId]       = useState(readStoredId);
+  const [loading, setLoading]             = useState(true);
+  const [showModal, setShowModal]         = useState(false);
+  const [editingProfile, setEditingProfile] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [editingCvDoc, setEditingCvDoc]   = useState(null); // cv_document being edited
+  const { showToast } = useToast();
+
+  useEffect(() => { loadAll(); }, []);
+
+  function selectProfile(id) {
+    setSelectedId(id);
+    storeId(id);
+  }
+
+  async function loadAll() {
+    try {
+      setLoading(true);
+      const [p, d] = await Promise.all([profileAPI.list(), cvDocumentAPI.list()]);
+      setProfiles(p);
+      setCvDocuments(d);
+
+      const unorganised = d.filter(doc => !doc.profile_id);
+      const stored = readStoredId();
+
+      let valid;
+      if (stored === UNORGANISED && unorganised.length > 0) {
+        valid = UNORGANISED;
+      } else if (stored && stored !== UNORGANISED && p.some(pr => pr.id === stored)) {
+        valid = stored;
+      } else if (p.length > 0) {
+        valid = p[0].id;
+      } else if (unorganised.length > 0) {
+        valid = UNORGANISED;
+      } else {
+        valid = null;
+      }
+
+      setSelectedId(valid);
+      storeId(valid);
+    } catch (err) {
+      showToast('Failed to load library: ' + err.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Profile actions ──────────────────────────────────────────────────────────
+
+  async function handleSaveProfile(name, description) {
+    try {
+      if (editingProfile) {
+        await profileAPI.update(editingProfile.id, name, description);
+      } else {
+        const { id } = await profileAPI.create(name, description);
+        selectProfile(id);
+      }
+      setShowModal(false);
+      setEditingProfile(null);
+      await loadAll();
+      showToast(editingProfile ? 'Profile updated' : 'Profile created');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function handleDeleteProfile(id) {
+    try {
+      await profileAPI.delete(id);
+      if (selectedId === id) selectProfile(null);
+      await loadAll();
+      showToast('Profile deleted');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setDeleteConfirm(null);
+    }
+  }
+
+  // ── CV Document actions ──────────────────────────────────────────────────────
+
+  async function handleSetPrimaryCv(profileId, cvDocId) {
+    try {
+      await profileAPI.setBaseCv(profileId, cvDocId);
+      await loadAll();
+      showToast('Primary CV updated');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function handleDeleteCvDoc(id) {
+    try {
+      await cvDocumentAPI.delete(id);
+      await loadAll();
+      showToast('CV deleted');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setDeleteConfirm(null);
+    }
+  }
+
+  // Move a CV to a different profile (or to unorganised when newProfileId is null).
+  async function handleMoveCvDoc(docId, newProfileId) {
+    try {
+      await cvDocumentAPI.update(docId, { profile_id: newProfileId });
+      await loadAll();
+      showToast(newProfileId ? 'Moved to profile' : 'Moved to unorganised');
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function handleEditCvDetails(docId, newTitle, newNotes) {
+    try {
+      await cvDocumentAPI.update(docId, { title: newTitle, notes: newNotes });
+      await loadAll();
+      showToast('CV updated');
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setEditingCvDoc(null);
+    }
+  }
+
+  function handleOpenCv(docId) {
+    onNavigate('assembly', { documentId: docId });
+  }
+
+  async function handleCloneCv(doc) {
+    try {
+      const full = await cvDocumentAPI.get(doc.id);
+      const { id } = await cvDocumentAPI.create({
+        title:        `${doc.title} (copy)`,
+        content_html: full.content_html || '',
+        profile_id:   doc.profile_id,
+        job_ad_text:  full.job_ad_text  || '',
+      });
+      await loadAll();
+      showToast('CV copied');
+      onNavigate('assembly', { documentId: id });
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  function handleNewCv(profileId = null) {
+    onNavigate('assembly', { newDocument: true, profileId: profileId ?? undefined });
+  }
+
+  // ── Derived data ─────────────────────────────────────────────────────────────
+
+  const selectedProfile = profiles.find(p => p.id === selectedId) ?? null;
+  const profileDocs     = cvDocuments.filter(d => d.profile_id === selectedId);
+  const primaryDocs     = profileDocs.filter(d => d.is_base);
+  const variantDocs     = profileDocs.filter(d => !d.is_base);
+  const unorganisedDocs = cvDocuments.filter(d => !d.profile_id);
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+
+  if (loading) return <div className="cvlib-loading">Loading…</div>;
+
+  return (
+    <div className="cvlib">
+
+      <div className="cvlib-header">
+        <div>
+          <h1 className="cvlib-title">CV Library</h1>
+          <p className="cvlib-subtitle">Organise your CVs into role profiles</p>
+        </div>
+        <button className="btn btn-primary btn-sm btn-with-icon" onClick={() => handleNewCv(null)}>
+          <PlusIcon className="icon" /> New CV
+        </button>
+      </div>
+
+      <div className="cvlib-body">
+
+        {/* Left: profile list */}
+        <aside className="cvlib-sidebar">
+          <div className="cvlib-sidebar-header">
+            <span className="cvlib-section-label">Profiles</span>
+            <button
+              className="btn btn-ghost btn-sm btn-with-icon"
+              onClick={() => { setEditingProfile(null); setShowModal(true); }}
+              title="New profile"
+            >
+              <PlusIcon className="icon" /> New
+            </button>
+          </div>
+
+          {profiles.length === 0 && unorganisedDocs.length === 0 ? (
+            <p className="cvlib-empty-hint">
+              No profiles yet. Create one to group your CVs by role type.
+            </p>
+          ) : (
+            <ul className="cvlib-profile-list">
+              {profiles.map(p => (
+                <li key={p.id}>
+                  <button
+                    className={`cvlib-profile-btn${p.id === selectedId ? ' selected' : ''}`}
+                    onClick={() => selectProfile(p.id)}
+                  >
+                    <span className="cvlib-profile-name">{p.name}</span>
+                    <span className="cvlib-profile-count">
+                      {cvDocuments.filter(d => d.profile_id === p.id).length}
+                    </span>
+                  </button>
+                </li>
+              ))}
+              {unorganisedDocs.length > 0 && (
+                <li>
+                  <button
+                    className={`cvlib-profile-btn cvlib-profile-btn-unorganised${selectedId === UNORGANISED ? ' selected' : ''}`}
+                    onClick={() => selectProfile(UNORGANISED)}
+                  >
+                    <span className="cvlib-profile-name">Unorganised</span>
+                    <span className="cvlib-profile-count">{unorganisedDocs.length}</span>
+                  </button>
+                </li>
+              )}
+            </ul>
+          )}
+        </aside>
+
+        {/* Right: profile detail */}
+        <div className="cvlib-detail">
+          {selectedId === UNORGANISED ? (
+            <UnorganisedDetail
+              docs={unorganisedDocs}
+              profiles={profiles}
+              onOpen={handleOpenCv}
+              onClone={handleCloneCv}
+              onMove={handleMoveCvDoc}
+              onEditDetails={setEditingCvDoc}
+              onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title })}
+              onNewCv={() => handleNewCv(null)}
+            />
+          ) : selectedProfile ? (
+            <ProfileDetail
+              profile={selectedProfile}
+              primaryDocs={primaryDocs}
+              variantDocs={variantDocs}
+              profiles={profiles}
+              onEdit={() => { setEditingProfile(selectedProfile); setShowModal(true); }}
+              onDelete={() => setDeleteConfirm({ type: 'profile', id: selectedProfile.id, name: selectedProfile.name })}
+              onSetPrimary={handleSetPrimaryCv}
+              onOpen={handleOpenCv}
+              onClone={handleCloneCv}
+              onMove={handleMoveCvDoc}
+              onEditDetails={setEditingCvDoc}
+              onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title })}
+              onNewCv={() => handleNewCv(selectedProfile.id)}
+            />
+          ) : (
+            <div className="cvlib-no-selection">
+              <FolderOpenIcon className="cvlib-no-selection-icon" />
+              <p>Select a profile to see its CVs, or create a new profile.</p>
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {showModal && (
+        <ProfileModal
+          profile={editingProfile}
+          onSave={handleSaveProfile}
+          onClose={() => { setShowModal(false); setEditingProfile(null); }}
+        />
+      )}
+
+      {editingCvDoc && (
+        <EditCvDetailsModal
+          doc={editingCvDoc}
+          onSave={handleEditCvDetails}
+          onClose={() => setEditingCvDoc(null)}
+        />
+      )}
+
+      {deleteConfirm && (
+        <DeleteConfirmModal
+          name={deleteConfirm.name}
+          isProfile={deleteConfirm.type === 'profile'}
+          onConfirm={() => deleteConfirm.type === 'profile'
+            ? handleDeleteProfile(deleteConfirm.id)
+            : handleDeleteCvDoc(deleteConfirm.id)
+          }
+          onCancel={() => setDeleteConfirm(null)}
+        />
+      )}
+
+    </div>
+  );
+}
+
+// ── UnorganisedDetail ─────────────────────────────────────────────────────────
+
+function UnorganisedDetail({ docs, profiles, onOpen, onClone, onMove, onEditDetails, onDeleteDoc, onNewCv }) {
+  return (
+    <section className="cvlib-profile-detail">
+      <div className="cvlib-profile-detail-header">
+        <div>
+          <h2 className="cvlib-profile-detail-name">Unorganised CVs</h2>
+          <p className="cvlib-profile-detail-desc">These CVs are not assigned to any profile.</p>
+        </div>
+      </div>
+      <ul className="cvlib-doc-list">
+        {docs.map(doc => (
+          <CvDocRow
+            key={doc.id}
+            doc={doc}
+            isPrimary={false}
+            showSetPrimary={false}
+            profiles={profiles}
+            onOpen={() => onOpen(doc.id)}
+            onClone={() => onClone(doc)}
+            onMove={onMove}
+            onEditDetails={() => onEditDetails(doc)}
+            onDelete={() => onDeleteDoc(doc.id, doc.title)}
+          />
+        ))}
+      </ul>
+      <button className="btn btn-ghost btn-sm btn-with-icon cvlib-new-cv-btn" onClick={onNewCv}>
+        <PlusIcon className="icon" /> New CV (unorganised)
+      </button>
+    </section>
+  );
+}
+
+// ── ProfileDetail ─────────────────────────────────────────────────────────────
+
+function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, onDelete,
+                         onSetPrimary, onOpen, onClone, onMove, onEditDetails, onDeleteDoc, onNewCv }) {
+  return (
+    <section className="cvlib-profile-detail">
+      <div className="cvlib-profile-detail-header">
+        <div>
+          <h2 className="cvlib-profile-detail-name">{profile.name}</h2>
+          {profile.description && (
+            <p className="cvlib-profile-detail-desc">{profile.description}</p>
+          )}
+        </div>
+        <div className="cvlib-profile-detail-actions">
+          <button className="btn btn-ghost btn-sm btn-with-icon" onClick={onEdit}>
+            <PencilIcon className="icon" /> Edit
+          </button>
+          <button className="btn btn-danger btn-sm btn-with-icon" onClick={onDelete}>
+            <TrashIcon className="icon" /> Delete profile
+          </button>
+        </div>
+      </div>
+
+      <div className="cvlib-subsection">
+        <h3 className="cvlib-subsection-heading">
+          <StarSolid className="cvlib-star-icon" /> Primary CV
+        </h3>
+        {primaryDocs.length === 0 ? (
+          <p className="cvlib-empty-hint">
+            No primary CV set. Mark any variant as primary to feature it here.
+          </p>
+        ) : (
+          <ul className="cvlib-doc-list">
+            {primaryDocs.map(doc => (
+              <CvDocRow key={doc.id} doc={doc} isPrimary={true} showSetPrimary={false}
+                profiles={profiles}
+                onOpen={() => onOpen(doc.id)} onClone={() => onClone(doc)}
+                onMove={onMove} onEditDetails={() => onEditDetails(doc)}
+                onDelete={() => onDeleteDoc(doc.id, doc.title)} />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="cvlib-subsection">
+        <h3 className="cvlib-subsection-heading">
+          Variants {variantDocs.length > 0 && <span className="cvlib-count-badge">{variantDocs.length}</span>}
+        </h3>
+        {variantDocs.length === 0 ? (
+          <p className="cvlib-empty-hint">No variants yet.</p>
+        ) : (
+          <ul className="cvlib-doc-list">
+            {variantDocs.map(doc => (
+              <CvDocRow key={doc.id} doc={doc} isPrimary={false} showSetPrimary={true}
+                profiles={profiles}
+                onSetPrimary={() => onSetPrimary(profile.id, doc.id)}
+                onOpen={() => onOpen(doc.id)} onClone={() => onClone(doc)}
+                onMove={onMove} onEditDetails={() => onEditDetails(doc)}
+                onDelete={() => onDeleteDoc(doc.id, doc.title)} />
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <button className="btn btn-ghost btn-sm btn-with-icon cvlib-new-cv-btn" onClick={onNewCv}>
+        <PlusIcon className="icon" /> New CV in this profile
+      </button>
+    </section>
+  );
+}
+
+// ── CvDocRow ──────────────────────────────────────────────────────────────────
+
+function CvDocRow({ doc, isPrimary, showSetPrimary, onSetPrimary, onOpen, onClone, onMove, onEditDetails, onDelete, profiles }) {
+  const updatedDate = doc.updated_at
+    ? new Date(doc.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+
+  // Profiles available to move to: all except the one this CV currently belongs to.
+  const moveTargets = (profiles || []).filter(p => p.id !== doc.profile_id);
+
+  function handleMoveChange(e) {
+    const val = e.target.value;
+    if (!val) return;
+    onMove(doc.id, val === 'none' ? null : parseInt(val));
+    // Reset select back to placeholder so it can fire onChange again next time.
+    e.target.value = '';
+  }
+
+  return (
+    <li className={`cvlib-doc-row${isPrimary ? ' is-base' : ''}`}>
+      <div className="cvlib-doc-info">
+        {isPrimary && <StarSolid className="cvlib-doc-star" aria-hidden="true" />}
+        <span className="cvlib-doc-title" title={doc.title || 'Untitled CV'}>
+          {doc.title || 'Untitled CV'}
+        </span>
+        {doc.notes && (
+          <span title={doc.notes} aria-label="Has notes" className="cvlib-note-indicator">
+            <ChatBubbleBottomCenterTextIcon className="cvlib-note-icon" />
+          </span>
+        )}
+        {updatedDate && <span className="cvlib-doc-date">Updated {updatedDate}</span>}
+      </div>
+      <div className="cvlib-doc-actions">
+        {showSetPrimary && (
+          <button className="cvlib-icon-btn" onClick={onSetPrimary} title="Set as primary CV"
+                  aria-label="Set as primary CV">
+            <StarIcon className="cvlib-icon-btn-icon" />
+          </button>
+        )}
+
+        {(moveTargets.length > 0 || doc.profile_id) && (
+          <select
+            className="cvlib-move-select"
+            defaultValue=""
+            onChange={handleMoveChange}
+            title="Move to a different profile"
+            aria-label="Move to a different profile"
+          >
+            <option value="" disabled>Move to…</option>
+            {moveTargets.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+            {doc.profile_id && (
+              <option value="none">Unorganised (remove from profile)</option>
+            )}
+          </select>
+        )}
+
+        <button className="cvlib-icon-btn" onClick={onEditDetails} title="Edit name and notes"
+                aria-label="Edit name and notes">
+          <PencilIcon className="cvlib-icon-btn-icon" />
+        </button>
+        <button className="cvlib-icon-btn" onClick={onOpen} title="Open in Assembly"
+                aria-label="Open in Assembly">
+          <ArrowTopRightOnSquareIcon className="cvlib-icon-btn-icon" />
+        </button>
+        <button className="cvlib-icon-btn" onClick={onClone} title="Create a copy"
+                aria-label="Create a copy">
+          <DocumentDuplicateIcon className="cvlib-icon-btn-icon" />
+        </button>
+        <button className="cvlib-icon-btn cvlib-icon-btn-danger" onClick={onDelete}
+                title="Delete this CV" aria-label="Delete this CV">
+          <TrashIcon className="cvlib-icon-btn-icon" />
+        </button>
+      </div>
+    </li>
+  );
+}
+
+// ── ProfileModal ──────────────────────────────────────────────────────────────
+
+function ProfileModal({ profile, onSave, onClose }) {
+  const [name, setName]        = useState(profile?.name ?? '');
+  const [description, setDesc] = useState(profile?.description ?? '');
+  const nameRef = useRef(null);
+
+  useEffect(() => { nameRef.current?.focus(); }, []);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onSave(name.trim(), description.trim());
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title">{profile ? 'Edit profile' : 'New profile'}</h2>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <label className="modal-label">
+            Name
+            <input ref={nameRef} className="modal-input" value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="e.g. Engineering Manager" required />
+          </label>
+          <label className="modal-label">
+            Description <span className="modal-optional">(optional)</span>
+            <input className="modal-input" value={description}
+              onChange={e => setDesc(e.target.value)}
+              placeholder="e.g. For senior IC and EM roles in engineering" />
+          </label>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={!name.trim()}>
+              {profile ? 'Save changes' : 'Create profile'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── EditCvDetailsModal ────────────────────────────────────────────────────────
+
+function EditCvDetailsModal({ doc, onSave, onClose }) {
+  const [name, setName]   = useState(doc.title || '');
+  const [notes, setNotes] = useState(doc.notes || '');
+  const nameRef = useRef(null);
+
+  useEffect(() => { nameRef.current?.focus(); }, []);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    onSave(doc.id, name.trim(), notes.trim());
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title">Edit CV details</h2>
+        <form onSubmit={handleSubmit} className="modal-form">
+          <label className="modal-label">
+            Name
+            <input
+              ref={nameRef}
+              className="modal-input"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+            />
+          </label>
+          <label className="modal-label">
+            Note <span className="modal-optional">(optional — shown as a tooltip in the library)</span>
+            <textarea
+              className="modal-input"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="e.g. Tailored for senior IC roles at scale-ups"
+              rows={3}
+              style={{ resize: 'vertical' }}
+            />
+          </label>
+          <div className="modal-actions">
+            <button type="button" className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn btn-primary btn-sm" disabled={!name.trim()}>
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── DeleteConfirmModal ────────────────────────────────────────────────────────
+
+function DeleteConfirmModal({ name, isProfile, onConfirm, onCancel }) {
+  return (
+    <div className="modal-overlay" onClick={onCancel}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title">Delete {isProfile ? 'profile' : 'CV'}?</h2>
+        <p className="modal-body-text">
+          {isProfile
+            ? <>Deleting <strong>{name}</strong> will remove the profile. CVs in this profile will become unorganised but will not be deleted.</>
+            : <>Delete <strong>{name}</strong>? This cannot be undone.</>
+          }
+        </p>
+        <div className="modal-actions">
+          <button className="btn btn-ghost btn-sm" onClick={onCancel}>Cancel</button>
+          <button className="btn btn-danger btn-sm" onClick={onConfirm}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}

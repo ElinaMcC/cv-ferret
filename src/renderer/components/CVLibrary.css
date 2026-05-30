@@ -1,0 +1,435 @@
+/* ── Page shell ──────────────────────────────────────────────────────────────── */
+
+.cvlib {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0;
+}
+
+.cvlib-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────────── */
+
+.cvlib-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cvlib-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 2px;
+}
+
+.cvlib-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Two-column body ─────────────────────────────────────────────────────────── */
+
+.cvlib-body {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Left sidebar: profile list ──────────────────────────────────────────────── */
+
+.cvlib-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.cvlib-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cvlib-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.cvlib-profile-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cvlib-profile-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13.5px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.cvlib-profile-btn:hover  { background: var(--bg-hover); }
+.cvlib-profile-btn.selected { background: var(--color-primary); color: white; font-weight: 600; }
+
+.cvlib-profile-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.cvlib-profile-count {
+  font-size: 11px;
+  background: rgba(0,0,0,0.12);
+  border-radius: 10px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
+.cvlib-profile-btn.selected .cvlib-profile-count { background: rgba(255,255,255,0.25); }
+
+.cvlib-profile-btn-unorganised { border-top: 1px solid var(--border); margin-top: 4px; }
+.cvlib-profile-btn-unorganised .cvlib-profile-name { color: var(--text-muted); font-style: italic; }
+.cvlib-profile-btn-unorganised.selected .cvlib-profile-name { color: white; font-style: normal; }
+
+/* ── Right: detail panel ─────────────────────────────────────────────────────── */
+
+.cvlib-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.cvlib-no-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 1;
+  min-height: 200px;
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.cvlib-no-selection-icon { width: 40px; height: 40px; opacity: 0.4; }
+
+/* ── Profile detail card ─────────────────────────────────────────────────────── */
+
+.cvlib-profile-detail {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cvlib-profile-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cvlib-profile-detail-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+.cvlib-profile-detail-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.cvlib-profile-detail-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Subsections ─────────────────────────────────────────────────────────────── */
+
+.cvlib-subsection { display: flex; flex-direction: column; gap: 8px; }
+
+.cvlib-subsection-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.cvlib-star-icon  { width: 14px; height: 14px; color: #f59e0b; }
+.cvlib-count-badge {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.cvlib-empty-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 6px 0;
+}
+
+.cvlib-section-heading {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 4px;
+}
+
+.cvlib-section-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* ── CV document rows ────────────────────────────────────────────────────────── */
+
+.cvlib-doc-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cvlib-doc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 5px;
+  transition: border-color 0.12s;
+}
+
+.cvlib-doc-row.is-base {
+  border-color: #f59e0b;
+  background: var(--color-warning-bg, #fef3c7);
+}
+
+html.dark .cvlib-doc-row.is-base { background: var(--color-warning-bg); }
+
+.cvlib-doc-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cvlib-doc-star  { width: 15px; height: 15px; color: #f59e0b; flex-shrink: 0; }
+
+.cvlib-doc-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0; /* required for ellipsis inside a flex child */
+  cursor: default;
+}
+
+.cvlib-doc-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cvlib-note-indicator {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  cursor: help;
+}
+
+.cvlib-note-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.cvlib-doc-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Icon-only action buttons for CV rows */
+.cvlib-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  flex-shrink: 0;
+}
+
+.cvlib-icon-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.cvlib-icon-btn-danger:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+html.dark .cvlib-icon-btn-danger:hover {
+  background: #2d0f0f;
+  border-color: #f87171;
+  color: #f87171;
+}
+
+.cvlib-icon-btn-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.cvlib-move-select {
+  padding: 5px 8px;
+  font-size: 12.5px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  max-width: 140px;
+}
+
+.cvlib-move-select:focus { outline: none; border-color: var(--color-primary); }
+
+.cvlib-new-cv-btn { align-self: flex-start; }
+
+/* ── Unorganised CVs section ─────────────────────────────────────────────────── */
+
+.cvlib-unorganised {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+}
+
+/* ── Modals ──────────────────────────────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  width: 420px;
+  max-width: 90vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 16px;
+}
+
+.modal-body-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.modal-form { display: flex; flex-direction: column; gap: 14px; }
+
+.modal-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.modal-optional { font-weight: 400; color: var(--text-muted); }
+
+.modal-input {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.modal-input:focus { outline: none; border-color: var(--color-primary); }
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}

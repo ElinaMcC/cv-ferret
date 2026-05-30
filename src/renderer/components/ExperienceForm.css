@@ -1,0 +1,218 @@
+@import '../styles/shared.css';
+
+.experience-form-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--bg-tertiary);
+  padding-bottom: 16px;
+}
+
+.form-header h2 {
+  margin: 0;
+  color: var(--text-heading);
+}
+
+.experience-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+.form-section {
+  border: none;
+  padding: 16px 0;
+  margin: 0;
+}
+
+.form-section:not(:last-of-type) {
+  border-bottom: 1px solid var(--bg-tertiary);
+  margin-bottom: 16px;
+  padding-bottom: 20px;
+}
+
+.form-section legend {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-heading);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.tag-input-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tag-input-container input {
+  flex: 1;
+}
+
+.tag-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tag-suggestion {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.tag-suggestion:hover {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.tag-removable {
+  gap: 6px;
+}
+
+.tag-remove {
+  background: none;
+  border: none;
+  color: #1976d2;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-remove:hover {
+  opacity: 0.7;
+}
+
+.error-message {
+  padding: 12px;
+  background-color: var(--color-error-bg);
+  border-left: 4px solid #f00;
+  border-radius: 4px;
+  color: var(--color-error-text);
+  margin-bottom: 16px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bg-tertiary);
+  justify-content: flex-end;
+}
+
+
+.role-priority-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.role-priority-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.role-priority-field.rank-field {
+  flex: 0 0 72px;
+}
+
+.field-sub-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.role-priority-add-btn {
+  flex-shrink: 0;
+  margin-bottom: 1px;
+}
+
+.role-priority-tag {
+  background-color: #e8f4f8;
+  color: #1a6a8a;
+  border: 1px solid #b8d9e8;
+}
+
+.role-rank {
+  font-weight: 700;
+  opacity: 0.75;
+}

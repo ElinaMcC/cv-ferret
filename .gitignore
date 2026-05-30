@@ -1,0 +1,41 @@
+node_modules/
+dist/
+build/
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+.env
+.env.local
+*.log
+
+# Personal input files — never commit
+Input/
+
+# Local data folder — app data belongs in %APPDATA%\.cv-builder\, not here
+data/
+
+# Installer build outputs
+release/
+installer/Output/
+
+# Fresh-start test profile (npm run start:fresh)
+test-profile/
+
+# Planning and internal documents
+TEMP-*.md
+plan-cvBuilder.prompt.md
+IDEATION-*.md
+REFACTOR-PLAN.md
+ARCHITECTURE.md
+CV-EXTRACTION.md
+ICON_GUIDELINES.md
+
+# Claude Code internal memory
+memory/
+
+# Test / scratch files
+test-doc.pdf
+
+# Electron Forge / webpack build artefacts
+.webpack/

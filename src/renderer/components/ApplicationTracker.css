@@ -1,0 +1,731 @@
+/* ── Page layout ─────────────────────────────────────────────────────────────── */
+
+.at-page {
+  display: flex;
+  height: 100%;
+  margin: -20px;
+  overflow: hidden;
+}
+
+.at-loading {
+  padding: 40px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ── Left: list panel ────────────────────────────────────────────────────────── */
+
+.at-list-panel {
+  flex: 0 0 320px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.at-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.at-list-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* ── Status filter tabs ──────────────────────────────────────────────────────── */
+
+.at-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.at-status-tab {
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-card);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.12s;
+}
+
+.at-status-tab:hover { background: var(--bg-tertiary); }
+
+.at-status-tab.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.at-tab-count {
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+/* ── Application list ────────────────────────────────────────────────────────── */
+
+.at-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.at-list-empty {
+  padding: 20px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.at-error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--color-error-bg);
+  border-left: 3px solid var(--color-error-text);
+  color: var(--color-error-text);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.at-error button {
+  background: none; border: none; cursor: pointer; color: var(--color-error-text); font-size: 14px; padding: 0 2px;
+}
+
+/* ── Application card ────────────────────────────────────────────────────────── */
+
+.at-card {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--bg-tertiary);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.at-card:hover { background: var(--bg-secondary); }
+
+.at-card-selected {
+  background: var(--color-info-bg);
+  border-left: 3px solid var(--color-primary);
+  padding-left: 13px;
+}
+
+.at-card-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+}
+
+.at-card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.at-card-employer {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.at-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.at-card-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Status badge ────────────────────────────────────────────────────────────── */
+
+.at-status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* ── Right: detail panel ─────────────────────────────────────────────────────── */
+
+.at-detail-panel {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-card);
+}
+
+.at-empty-detail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.at-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── Detail header ───────────────────────────────────────────────────────────── */
+
+.at-detail-header {
+  padding: 18px 28px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
+}
+
+.at-detail-title-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.at-field-title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border: none;
+  border-bottom: 2px solid var(--border);
+  padding: 4px 0;
+  background: transparent;
+  outline: none;
+  min-width: 0;
+}
+.at-field-title:focus { border-bottom-color: var(--color-primary); }
+.at-field-title::placeholder { color: #ccc; font-weight: 400; }
+
+.at-field-employer {
+  flex: 0 0 200px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  border: none;
+  border-bottom: 2px solid var(--border);
+  padding: 4px 0;
+  background: transparent;
+  outline: none;
+}
+.at-field-employer:focus { border-bottom-color: var(--color-primary); }
+.at-field-employer::placeholder { color: #ccc; }
+
+.at-detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.at-status-select {
+  padding: 5px 10px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--bg-card);
+  cursor: pointer;
+  outline: none;
+}
+.at-status-select:focus { box-shadow: 0 0 0 2px rgba(52,152,219,0.15); }
+
+.at-delete-btn { color: var(--color-error-text); border-color: var(--color-error-border); }
+.at-delete-btn:hover { background: var(--color-error-bg); }
+
+/* ── Detail body ─────────────────────────────────────────────────────────────── */
+
+.at-detail-body {
+  padding: 20px 28px 40px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.at-created-date {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.at-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.at-form-group > label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.at-field {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  outline: none;
+}
+.at-field:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(52,152,219,0.1); }
+
+.at-field-date { width: 180px; }
+
+.at-ad-textarea { resize: vertical; line-height: 1.5; }
+
+/* ── Collapsible job ad toggle ───────────────────────────────────────────────── */
+
+.at-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 0;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.at-toggle-btn:hover { color: var(--text-primary); }
+
+/* ── CV source tabs ──────────────────────────────────────────────────────────── */
+
+.at-cv-source-tabs {
+  display: flex;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.at-cv-source-tab {
+  padding: 5px 14px;
+  font-size: 13px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+
+.at-cv-source-tab:last-child { border-right: none; }
+
+.at-cv-source-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.at-cv-source-tab.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* ── File missing banner ─────────────────────────────────────────────────────── */
+
+.at-file-missing-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  margin-bottom: 8px;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  border-radius: 5px;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
+
+/* ── External file row ───────────────────────────────────────────────────────── */
+
+.at-file-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.at-file-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.at-file-path {
+  font-size: 11px;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.at-file-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* ── Composition row ─────────────────────────────────────────────────────────── */
+
+.at-composition-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.at-composition-select {
+  flex: 1;
+  min-width: 0;
+}
+
+.at-autosave-indicator {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.at-composition-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Reference letters ───────────────────────────────────────────────────────── */
+
+.at-refs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.at-ref-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.at-ref-name { color: var(--text-primary); }
+
+.at-ref-job {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.at-empty-note {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── Activity notes ──────────────────────────────────────────────────────────── */
+
+.at-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.at-note {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--bg-secondary);
+}
+
+.at-note-date {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.at-note-text {
+  flex: 1;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.at-note-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  font-size: 16px;
+  padding: 0 2px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.at-note-delete:hover { color: var(--color-error-text); }
+
+.at-note-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.at-note-date-input {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  outline: none;
+}
+.at-note-date-input:focus { border-color: var(--color-primary); }
+
+.at-note-text-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  min-width: 0;
+}
+.at-note-text-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(52,152,219,0.1); }
+
+/* ── Cover letter ────────────────────────────────────────────────────────────── */
+
+.at-cl-section {
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+}
+
+.at-cl-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.at-cl-style-radios {
+  display: flex;
+  gap: 16px;
+}
+
+.at-cl-radio {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.at-cl-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.at-cl-load-select {
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  max-width: 220px;
+}
+
+.at-cl-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 13.5px;
+  font-family: inherit;
+  line-height: 1.65;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+.at-cl-textarea:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(52,152,219,0.1); }
+.at-cl-textarea:disabled { background: var(--bg-tertiary); color: var(--text-muted); }
+
+.at-cl-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.at-cl-wordcount {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ── Export modal ─────────────────────────────────────────────────────────────── */
+
+.at-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.at-modal {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 28px;
+  width: 500px;
+  max-width: calc(100vw - 40px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.at-modal h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--text-heading);
+}
+
+.at-modal-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+
+.at-open-folder-btn {
+  margin-top: 10px;
+}
+
+.at-export-folder {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.at-export-folder code {
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.at-inline-link {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.at-inline-link:hover { text-decoration: underline; }
+
+.at-modal-check-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--text-primary);
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.at-modal-check-label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.at-modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.at-modal-result {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--color-success-bg, #f0fdf4);
+  border: 1px solid var(--color-success-border);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--color-success-text);
+}
+html.dark .at-modal-result {
+  background: rgba(22, 163, 74, 0.12);
+  border-color: rgba(22, 163, 74, 0.30);
+}
+
+.at-modal-result p {
+  margin: 0 0 6px;
+}
+
+.at-modal-result code {
+  font-family: monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.at-modal-result ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+}
+
+.at-modal-result li {
+  margin: 2px 0;
+}

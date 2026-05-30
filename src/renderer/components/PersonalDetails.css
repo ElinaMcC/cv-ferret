@@ -1,0 +1,141 @@
+@import '../styles/shared.css';
+
+.personal-page {
+  padding: 20px;
+  max-width: 760px;
+}
+
+.personal-page h1 {
+  margin-bottom: 28px;
+  color: var(--text-heading);
+}
+
+.personal-error {
+  padding: 12px;
+  background-color: var(--color-error-bg);
+  border-left: 4px solid #f00;
+  border-radius: 4px;
+  color: var(--color-error-text);
+  margin-bottom: 16px;
+}
+
+.personal-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.personal-form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.personal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+
+.personal-form-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.personal-form-group input,
+.personal-form-group textarea {
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+}
+
+
+.personal-form-group input:focus,
+.personal-form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+
+.personal-form-group textarea {
+  resize: vertical;
+}
+
+/* Links */
+.link-input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.link-input-row input {
+  flex: 1;
+}
+
+.links-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #f8f8f8;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.link-item a {
+  flex: 1;
+  color: var(--color-primary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-item a:hover {
+  text-decoration: underline;
+}
+
+.link-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+
+.link-remove:hover {
+  color: #e74c3c;
+}
+
+/* Save area */
+.personal-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--bg-tertiary);
+}
+
+.save-confirmation {
+  font-size: 14px;
+  color: var(--color-success-text);
+  font-weight: 500;
+}
