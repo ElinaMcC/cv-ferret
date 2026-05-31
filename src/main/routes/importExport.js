@@ -53,28 +53,6 @@ function formatJobDate(d, locale = 'en-GB') {
     .toLocaleDateString(locale, { month: 'short', year: 'numeric' });
 }
 
-function resolveJobBullets(composition, allJobs) {
-  const { selections, taskOrder } = composition;
-  return allJobs.map(job => {
-    const ids     = taskOrder?.[job.id] || (job.tasks || []).map(t => t.id);
-    const bullets = ids.map(taskId => {
-      const task = (job.tasks || []).find(t => t.id === taskId);
-      if (!task) return null;
-      const sel = selections?.[taskId];
-      if (!sel?.included) return null;
-      if (sel.versionId === 'ai-draft') return sel.aiDraft || null;
-      const ver = task.versions.find(v => v.id === sel.versionId);
-      return ver?.description || task.versions[0]?.description || null;
-    }).filter(Boolean);
-    if (!bullets.length) return null;
-    return {
-      job_title: job.job_title || '', employer: job.employer || '',
-      location: job.location || '', start_date: job.start_date || null,
-      end_date: job.end_date || null, bullets,
-    };
-  }).filter(Boolean);
-}
-
 function buildCVData(personal, jobs, education, training, skills, languages, options = {}) {
   const { cvOrder = 'newest-first', cvLocale = 'en-GB' } = options;
   const name = [personal.first_name, personal.last_name].filter(Boolean).join(' ');
@@ -255,17 +233,18 @@ router.post('/export/application/:id', async (req, res) => {
         fs.writeFileSync(path.join(folderPath, `${safeTitle}.docx`), docDocx);
         files.push(`${safeTitle}.pdf`, `${safeTitle}.docx`);
       }
-    } else {
-      let jobsWithBullets = [];
-      if (application.composition_id) {
-        const comp = db.getComposition(application.composition_id);
-        if (comp) jobsWithBullets = resolveJobBullets(comp, db.getAllJobsWithTasks());
+    } else if (application.cv_document_id) {
+      const cvDoc = db.getCvDocument(application.cv_document_id);
+      if (cvDoc) {
+        const safeTitle = (cvDoc.title || 'CV').replace(/[\\/:*?"<>|]/g, '-');
+        const [cvPdf, cvDocx] = await Promise.all([
+          generateDocumentPdf(cvDoc.content_html, cvDoc.title, exportOptions),
+          generateDocumentDocx(cvDoc.content_html, cvDoc.title, exportOptions),
+        ]);
+        fs.writeFileSync(path.join(folderPath, `${safeTitle}.pdf`), cvPdf);
+        fs.writeFileSync(path.join(folderPath, `${safeTitle}.docx`), cvDocx);
+        files.push(`${safeTitle}.pdf`, `${safeTitle}.docx`);
       }
-      const cvData = buildCVData(personal, jobsWithBullets, education, training, skills, languages, exportOptions);
-      const [cvDocx, cvPdf] = await Promise.all([generateCVDocx(cvData, exportOptions), generateCVPdf(cvData, exportOptions)]);
-      fs.writeFileSync(path.join(folderPath, `${cvBaseName}.docx`), cvDocx);
-      fs.writeFileSync(path.join(folderPath, `${cvBaseName}.pdf`), cvPdf);
-      files.push(`${cvBaseName}.docx`, `${cvBaseName}.pdf`);
     }
 
     if (application.cover_letter?.text) {

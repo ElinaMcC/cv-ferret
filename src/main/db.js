@@ -38,7 +38,6 @@ let data = {
   task_version_tags: [],
   references: [],
   applications: [],
-  compositions: [],
   education: [],
   training: [],
   skills: [],
@@ -57,7 +56,6 @@ let nextAppId = 1;
 let nextEducationId = 1;
 let nextTrainingId = 1;
 let nextRefId = 1;
-let nextCompositionId = 1;
 let nextDocumentId = 1;
 let nextProfileId = 1;
 let nextCvDocumentId = 1;
@@ -67,13 +65,13 @@ function initializeDatabase(userDataPath) {
   // safe to call multiple times (important for tests and re-init scenarios).
   data = {
     jobs: [], tasks: [], task_versions: [], task_version_tags: [],
-    references: [], applications: [], compositions: [], education: [],
+    references: [], applications: [], education: [],
     training: [], skills: [], languages: [], personal: {},
     documents: [], profiles: [], cv_documents: [],
   };
   nextJobId = 1; nextTaskId = 1; nextVersionId = 1; nextTagId = 1;
   nextAppId = 1; nextEducationId = 1; nextTrainingId = 1; nextRefId = 1;
-  nextCompositionId = 1; nextDocumentId = 1; nextProfileId = 1; nextCvDocumentId = 1;
+  nextDocumentId = 1; nextProfileId = 1; nextCvDocumentId = 1;
 
   // Ensure directory exists
   if (!fs.existsSync(userDataPath)) {
@@ -111,7 +109,6 @@ function initializeDatabase(userDataPath) {
       if (!data.skills) data.skills = [];
       if (!data.languages) data.languages = [];
       if (!data.personal) data.personal = {};
-      if (!data.compositions) data.compositions = [];
       if (!data.documents) data.documents = [];
       if (!data.profiles) data.profiles = [];
       if (!data.cv_documents) data.cv_documents = [];
@@ -122,6 +119,7 @@ function initializeDatabase(userDataPath) {
         if (a.document_id    === undefined) a.document_id    = null;
         if (a.cv_file_path   === undefined) a.cv_file_path   = null;
         if (a.cv_document_id === undefined) a.cv_document_id = null;
+        delete a.composition_id;
       });
 
       // Migrate: normalise status values from old English display strings to
@@ -158,7 +156,6 @@ function initializeDatabase(userDataPath) {
       if (data.education.length > 0) nextEducationId = Math.max(...data.education.map(e => e.id)) + 1;
       if (data.training.length > 0) nextTrainingId = Math.max(...data.training.map(t => t.id)) + 1;
       if (data.references.length > 0) nextRefId = Math.max(...data.references.map(r => r.id)) + 1;
-      if (data.compositions.length > 0) nextCompositionId = Math.max(...data.compositions.map(c => c.id)) + 1;
       if (data.documents.length > 0) nextDocumentId = Math.max(...data.documents.map(d => d.id)) + 1;
       if (data.profiles.length > 0) nextProfileId = Math.max(...data.profiles.map(p => p.id)) + 1;
       if (data.cv_documents.length > 0) nextCvDocumentId = Math.max(...data.cv_documents.map(d => d.id)) + 1;
@@ -268,6 +265,16 @@ function deleteTask(taskId) {
   const versionsToDelete = data.task_versions.filter(v => v.task_id === taskId).map(v => v.id);
   data.task_versions = data.task_versions.filter(v => v.task_id !== taskId);
   data.task_version_tags = data.task_version_tags.filter(t => !versionsToDelete.includes(t.task_version_id));
+  saveData();
+}
+
+function deleteJob(jobId) {
+  const taskIds = data.tasks.filter(t => t.job_id === jobId).map(t => t.id);
+  const versionIds = data.task_versions.filter(v => taskIds.includes(v.task_id)).map(v => v.id);
+  data.task_version_tags = data.task_version_tags.filter(t => !versionIds.includes(t.task_version_id));
+  data.task_versions = data.task_versions.filter(v => !taskIds.includes(v.task_id));
+  data.tasks = data.tasks.filter(t => t.job_id !== jobId);
+  data.jobs = data.jobs.filter(j => j.id !== jobId);
   saveData();
 }
 
@@ -627,37 +634,6 @@ function getTaskWithVersions(taskId) {
   return { ...task, versions };
 }
 
-function getAllCompositions() {
-  return data.compositions.map(({ id, name, mode, created_at, updated_at }) => ({ id, name, mode, created_at, updated_at }));
-}
-
-function getComposition(id) {
-  return data.compositions.find(c => c.id === id) || null;
-}
-
-function createComposition(name, payload) {
-  const now = new Date().toISOString();
-  const comp = { id: nextCompositionId++, name, ...payload, created_at: now, updated_at: now };
-  data.compositions.push(comp);
-  saveData();
-  return comp.id;
-}
-
-function updateComposition(id, name, payload) {
-  const comp = data.compositions.find(c => c.id === id);
-  if (comp) {
-    comp.name = name;
-    Object.assign(comp, payload);
-    comp.updated_at = new Date().toISOString();
-  }
-  saveData();
-}
-
-function deleteComposition(id) {
-  data.compositions = data.compositions.filter(c => c.id !== id);
-  saveData();
-}
-
 function importExperience(jobs) {
   const result = { jobs: 0, tasks: 0 };
   for (const job of jobs) {
@@ -765,7 +741,6 @@ function restoreData(newData) {
     task_version_tags: newData.task_version_tags || [],
     references: newData.references || [],
     applications: newData.applications || [],
-    compositions: newData.compositions || [],
     education: newData.education || [],
     training: newData.training || [],
     skills: newData.skills || [],
@@ -784,7 +759,6 @@ function restoreData(newData) {
   nextEducationId   = data.education.length      > 0 ? Math.max(...data.education.map(e => e.id))          + 1 : 1;
   nextTrainingId    = data.training.length       > 0 ? Math.max(...data.training.map(t => t.id))           + 1 : 1;
   nextRefId         = data.references.length     > 0 ? Math.max(...data.references.map(r => r.id))         + 1 : 1;
-  nextCompositionId = data.compositions.length   > 0 ? Math.max(...data.compositions.map(c => c.id))       + 1 : 1;
   nextDocumentId    = data.documents.length      > 0 ? Math.max(...data.documents.map(d => d.id))          + 1 : 1;
   nextProfileId     = data.profiles.length       > 0 ? Math.max(...data.profiles.map(p => p.id))           + 1 : 1;
   nextCvDocumentId  = data.cv_documents.length   > 0 ? Math.max(...data.cv_documents.map(d => d.id))       + 1 : 1;
@@ -807,18 +781,6 @@ function performAutoBackup() {
   console.log(`[db] Auto-backup saved (${ts})`);
 }
 
-function getCompositionPoints(compositionId) {
-  const comp = data.compositions.find(c => c.id === compositionId);
-  if (!comp || !comp.selections) return [];
-  return Object.values(comp.selections)
-    .filter(sel => sel.included)
-    .map(sel => {
-      if (sel.versionId === 'ai-draft') return sel.aiDraft || null;
-      return data.task_versions.find(v => v.id === sel.versionId)?.description || null;
-    })
-    .filter(Boolean);
-}
-
 function getAllApplications() {
   return [...data.applications].sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
@@ -827,7 +789,7 @@ function getApplication(id) {
   return data.applications.find(a => a.id === id) || null;
 }
 
-function createApplication({ employer, jobTitle, url, jobAdText, status, compositionId, documentId, cvDocumentId, cvFilePath, referenceIds }) {
+function createApplication({ employer, jobTitle, url, jobAdText, status, documentId, cvDocumentId, cvFilePath, referenceIds }) {
   const app = {
     id: nextAppId++,
     employer: employer || '',
@@ -835,7 +797,6 @@ function createApplication({ employer, jobTitle, url, jobAdText, status, composi
     url: url || '',
     job_ad_text: jobAdText || '',
     status: status || 'Saved',
-    composition_id: compositionId  || null,
     document_id:    documentId     || null,
     cv_document_id: cvDocumentId   || null,
     cv_file_path:   cvFilePath     || null,
@@ -976,10 +937,89 @@ function deleteCvDocument(id) {
   saveData();
 }
 
+// ── Batch operations ───────────────────────────────────────────────────────────
+
+function batchDeleteApplications(ids) {
+  const idSet = new Set(ids);
+  data.applications = data.applications.filter(a => !idSet.has(a.id));
+  saveData();
+}
+
+// Returns the stored_names of deleted references so the route can remove files.
+function batchDeleteReferences(ids) {
+  const idSet = new Set(ids);
+  const storedNames = data.references.filter(r => idSet.has(r.id)).map(r => r.stored_name);
+  data.references = data.references.filter(r => !idSet.has(r.id));
+  saveData();
+  return storedNames;
+}
+
+// deleteCvDocs: if true, also delete all cv_documents in each profile (not just unlink them).
+function batchDeleteProfiles(ids, { deleteCvDocs = false } = {}) {
+  const idSet = new Set(ids);
+  if (deleteCvDocs) {
+    const cvDocIds = data.cv_documents.filter(d => idSet.has(d.profile_id)).map(d => d.id);
+    const cvDocIdSet = new Set(cvDocIds);
+    data.profiles.forEach(p => { if (cvDocIdSet.has(p.base_cv_id)) p.base_cv_id = null; });
+    data.applications.forEach(a => { if (cvDocIdSet.has(a.cv_document_id)) a.cv_document_id = null; });
+    data.cv_documents = data.cv_documents.filter(d => !cvDocIdSet.has(d.id));
+  } else {
+    data.cv_documents.forEach(d => { if (idSet.has(d.profile_id)) d.profile_id = null; });
+  }
+  data.profiles = data.profiles.filter(p => !idSet.has(p.id));
+  saveData();
+}
+
+function batchDeleteCvDocuments(ids) {
+  const idSet = new Set(ids);
+  data.profiles.forEach(p => { if (idSet.has(p.base_cv_id)) p.base_cv_id = null; });
+  data.applications.forEach(a => {
+    if (idSet.has(a.cv_document_id)) a.cv_document_id = null;
+    if (idSet.has(a.document_id))    a.document_id    = null;
+  });
+  data.cv_documents = data.cv_documents.filter(d => !idSet.has(d.id));
+  saveData();
+}
+
+function batchDeleteJobs(ids) {
+  const idSet = new Set(ids);
+  const taskIds = data.tasks.filter(t => idSet.has(t.job_id)).map(t => t.id);
+  const taskIdSet = new Set(taskIds);
+  const versionIds = data.task_versions.filter(v => taskIdSet.has(v.task_id)).map(v => v.id);
+  const versionIdSet = new Set(versionIds);
+  data.task_version_tags = data.task_version_tags.filter(t => !versionIdSet.has(t.task_version_id));
+  data.task_versions = data.task_versions.filter(v => !taskIdSet.has(v.task_id));
+  data.tasks = data.tasks.filter(t => !idSet.has(t.job_id));
+  data.jobs = data.jobs.filter(j => !idSet.has(j.id));
+  saveData();
+}
+
+function batchDeleteTasks(ids) {
+  const idSet = new Set(ids);
+  const versionIds = data.task_versions.filter(v => idSet.has(v.task_id)).map(v => v.id);
+  const versionIdSet = new Set(versionIds);
+  data.task_version_tags = data.task_version_tags.filter(t => !versionIdSet.has(t.task_version_id));
+  data.task_versions = data.task_versions.filter(v => !idSet.has(v.task_id));
+  data.tasks = data.tasks.filter(t => !idSet.has(t.id));
+  saveData();
+}
+
+function batchMoveCvDocuments(ids, profileId) {
+  const idSet = new Set(ids);
+  data.cv_documents.forEach(d => {
+    if (idSet.has(d.id)) {
+      d.profile_id = profileId || null;
+      d.updated_at = new Date().toISOString();
+    }
+  });
+  saveData();
+}
+
 module.exports = {
   initializeDatabase,
   createJob,
   updateJob,
+  deleteJob,
   getAllJobs,
   getAllJobsWithTasks,
   createTask,
@@ -1016,18 +1056,14 @@ module.exports = {
   createReference,
   updateReference,
   deleteReference,
+  batchDeleteReferences,
   getReference,
-  getAllCompositions,
-  getComposition,
-  createComposition,
-  updateComposition,
-  deleteComposition,
   getAllApplications,
   getApplication,
   createApplication,
   updateApplication,
   deleteApplication,
-  getCompositionPoints,
+  batchDeleteApplications,
   importExperience,
   importEducation,
   getAllData,
@@ -1043,10 +1079,15 @@ module.exports = {
   createProfile,
   updateProfile,
   deleteProfile,
+  batchDeleteProfiles,
   setProfileBaseCv,
   getAllCvDocuments,
   getCvDocument,
   createCvDocument,
   updateCvDocument,
   deleteCvDocument,
+  batchDeleteCvDocuments,
+  batchMoveCvDocuments,
+  batchDeleteJobs,
+  batchDeleteTasks,
 };
