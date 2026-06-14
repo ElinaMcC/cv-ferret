@@ -46,6 +46,25 @@ router.put('/cv-documents/:id', (req, res) => {
 
 // ── Delete ────────────────────────────────────────────────────────────────────
 
+router.post('/cv-documents/batch-delete', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    db.batchDeleteCvDocuments(ids);
+    res.json({ success: true, deleted: ids.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/cv-documents/batch-move', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    const profileId = req.body.profileId != null ? Number(req.body.profileId) : null;
+    db.batchMoveCvDocuments(ids, profileId);
+    res.json({ success: true, moved: ids.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.delete('/cv-documents/:id', (req, res) => {
   try {
     db.deleteCvDocument(parseInt(req.params.id));

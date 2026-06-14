@@ -9,7 +9,7 @@ import StartNewCVDialog        from './StartNewCVDialog.jsx';
 import SaveToApplicationModal  from './SaveToApplicationModal.jsx';
 import { useAssemblyStore } from '../../stores/assemblyStore.js';
 import { usePoolStore }     from '../../stores/poolStore.js';
-import { cvDocumentAPI, settingsAPI, profileAPI, taskAPI, exportAPI } from '../../services/ipc.js';
+import { cvDocumentAPI, settingsAPI, profileAPI, taskAPI, exportAPI, applicationAPI } from '../../services/ipc.js';
 import { findJobIdForPosition, getAllPlainItems } from './tiptapUtils.js';
 import { useToast }        from '../../contexts/ToastContext.jsx';
 import './Assembly.css';
@@ -58,6 +58,8 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
   const [aiEnabled, setAiEnabled]             = useState(false);
   const [showLinkModal, setShowLinkModal]       = useState(false);
   const [showSaveAsModal, setShowSaveAsModal]   = useState(false);
+  const [deleteConfirm, setDeleteConfirm]       = useState(null);
+  const [deleting, setDeleting]                 = useState(false);
   const [exportNotification, setExportNotification] = useState(null);
   const [exportPathMissing, setExportPathMissing]   = useState(false);
   const [buildingBlockItems, setBuildingBlockItems] = useState(null);
@@ -311,6 +313,33 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
     }
   }
 
+  // ── Delete ──────────────────────────────────────────────────────────────────
+
+  async function handleDeleteClick() {
+    let linkedApps = 0;
+    try {
+      const apps = await applicationAPI.list();
+      linkedApps = apps.filter(a => a.cv_document_id === documentId).length;
+    } catch { /* show dialog without the warning if this fails */ }
+    setDeleteConfirm({ linkedApps });
+  }
+
+  async function handleConfirmDelete() {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await cvDocumentAPI.delete(documentId);
+      markClean();
+      showToast('CV deleted');
+      onNavigate('cv-library');
+    } catch (err) {
+      showToast('Delete failed: ' + err.message, 'error');
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm(null);
+    }
+  }
+
   // ── Export ──────────────────────────────────────────────────────────────────
 
   async function handleExport(format) {
@@ -455,6 +484,16 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
         />
       )}
 
+      {deleteConfirm && (
+        <DeleteCvConfirmDialog
+          title={title}
+          linkedApps={deleteConfirm.linkedApps}
+          deleting={deleting}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteConfirm(null)}
+        />
+      )}
+
       {documentId && (
         <div className="asm-inner">
           {exportPathMissing && (
@@ -498,6 +537,7 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
             onSave={handleSave}
             onSaveAs={() => setShowSaveAsModal(true)}
             onExport={handleExport}
+            onDelete={handleDeleteClick}
             onLinkToApp={() => setShowLinkModal(true)}
             onProfileChange={handleProfileChange}
             profiles={profiles}
@@ -781,6 +821,36 @@ function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
               ? 'Saving…'
               : `Save ${toSave.length} building block${toSave.length !== 1 ? 's' : ''}`
             }
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── DeleteCvConfirmDialog ────────────────────────────────────────────────────
+
+function DeleteCvConfirmDialog({ title, linkedApps, deleting, onConfirm, onCancel }) {
+  const ref = useRef(null);
+  useFocusTrap(true, ref);
+  return (
+    <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && !deleting && onCancel()}>
+      <div className="asm-dialog" role="alertdialog" aria-modal="true"
+           aria-labelledby="delete-cv-title" ref={ref}>
+        <h2 className="asm-dialog-title" id="delete-cv-title">Delete this CV?</h2>
+        <p className="asm-dialog-body">
+          Delete <strong>{title || 'this CV'}</strong>? This cannot be undone.
+        </p>
+        {linkedApps > 0 && (
+          <p className="asm-dialog-body asm-dialog-warning">
+            This CV is linked to {linkedApps} application{linkedApps !== 1 ? 's' : ''}.
+            Deleting it will remove the link — the application record will remain but without a CV attached.
+          </p>
+        )}
+        <div className="asm-dialog-actions">
+          <button className="btn btn-ghost btn-sm" onClick={onCancel} disabled={deleting}>Cancel</button>
+          <button className="btn btn-danger btn-sm" onClick={onConfirm} disabled={deleting}>
+            {deleting ? 'Deleting…' : 'Delete'}
           </button>
         </div>
       </div>

@@ -36,6 +36,16 @@ router.put('/profiles/:id', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.post('/profiles/batch-delete', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    const { deleteCvDocuments = false } = req.body;
+    db.batchDeleteProfiles(ids, { deleteCvDocs: deleteCvDocuments });
+    res.json({ success: true, deleted: ids.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.delete('/profiles/:id', (req, res) => {
   try {
     db.deleteProfile(parseInt(req.params.id));

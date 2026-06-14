@@ -121,6 +121,16 @@
   border-color: var(--color-primary) !important;
 }
 
+.asm-delete-btn:hover {
+  background: var(--color-error-bg, #fee2e2);
+  color: var(--color-error-text, #dc2626);
+  border-color: var(--color-error-text, #dc2626);
+}
+
+html.dark .asm-delete-btn:hover {
+  background: rgba(220, 38, 38, 0.15);
+}
+
 /* ── Export dropdown ─────────────────────────────────────────────────────────── */
 
 .asm-export-dropdown {
@@ -432,6 +442,13 @@
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.5;
+}
+
+.asm-dialog-warning {
+  color: var(--color-warning-text, #92400e);
+  background: var(--color-warning-bg, #fef3c7);
+  padding: 8px 12px;
+  border-radius: 6px;
 }
 
 .asm-dialog-label {

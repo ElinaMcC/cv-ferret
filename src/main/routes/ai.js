@@ -133,7 +133,7 @@ router.post('/cover-letter/generate', async (req, res) => {
 
     const [samples, points] = await Promise.all([
       loadStyleSamples(settings.coverLetterSamplesDir),
-      Promise.resolve(application.composition_id ? db.getCompositionPoints(application.composition_id) : []),
+      Promise.resolve([]),
     ]);
 
     const isShort      = style === 'short';

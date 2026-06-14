@@ -33,6 +33,15 @@ router.put('/applications/:id', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.post('/applications/batch-delete', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    db.batchDeleteApplications(ids);
+    res.json({ success: true, deleted: ids.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.delete('/applications/:id', (req, res) => {
   try {
     db.deleteApplication(parseInt(req.params.id));

@@ -130,6 +130,7 @@ Browser (React/Vite)  ←→  Express API (Node.js)  ←→  JSON files on disk
 - CV cards show whether a document is the base CV or a variant for its profile
 - Create a new CV, open an existing CV in Assembly, or create a new CV based on an existing one
 - Unorganised CVs (not assigned to a profile) appear in their own section
+- **Bulk edit** — toggle Select mode to check multiple CVs at once (with a select-all option), then move them to another profile or delete them together; deleting shows a warning if any selected CV is linked to an application
 
 ### Assembly
 
@@ -148,6 +149,9 @@ The unified CV editor, opened from the CV Library, the Dashboard, or the Applica
 **Export:**
 - Export to **Markdown**, **DOCX**, or **PDF** via the Export dropdown in the toolbar
 - **Save to application** — link the current CV to an existing application or quick-create a new one
+
+**Delete:**
+- **Delete** button in the toolbar permanently removes the current CV draft, with a confirmation dialog ("This cannot be undone"); if the CV is linked to an application, the dialog warns that the link will be removed but the application record itself is kept
 
 **Tracker back-link:**
 When Assembly is opened from the Application Tracker, a "← [Job Title] at [Employer]" back-link appears in the toolbar. Clicking it returns to the Tracker with that application pre-selected.
@@ -215,7 +219,6 @@ src/
 │       ├── settings.js            — Settings read/write
 │       ├── ai.js                  — AI version generation and CV assembly analysis
 │       ├── aiChat.js              — Conversational AI assistant (Assembly chat panel)
-│       ├── compositions.js        — Legacy compositions (retained for data compatibility)
 │       ├── documents.js           — Legacy document editor (retained for data compatibility)
 │       └── importExport.js        — Dashboard summary, import, export, backup/restore
 └── renderer/
@@ -305,6 +308,8 @@ src/
 | GET | `/api/cv-documents/:id` | Get a CV document |
 | PUT | `/api/cv-documents/:id` | Update a CV document |
 | DELETE | `/api/cv-documents/:id` | Delete a CV document |
+| POST | `/api/cv-documents/batch-delete` | Delete multiple CV documents (CV Library bulk edit) |
+| POST | `/api/cv-documents/batch-move` | Move multiple CV documents to a profile (CV Library bulk edit) |
 | POST | `/api/cv-documents/:id/export-pdf` | Export CV document to PDF |
 | POST | `/api/cv-documents/:id/export-docx` | Export CV document to DOCX |
 

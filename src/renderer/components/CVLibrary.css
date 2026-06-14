@@ -37,6 +37,12 @@
   color: var(--text-muted);
 }
 
+.cvlib-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* ── Two-column body ─────────────────────────────────────────────────────────── */
 
 .cvlib-body {
@@ -233,6 +239,42 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+/* ── Bulk-edit toolbar and checkboxes ────────────────────────────────────────── */
+
+.cvlib-bulk-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 5px;
+}
+
+.cvlib-bulk-select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.cvlib-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cvlib-doc-checkbox {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  cursor: pointer;
 }
 
 .cvlib-doc-row {
