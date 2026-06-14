@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   PlusIcon, PencilIcon, TrashIcon, StarIcon,
   FolderOpenIcon, DocumentDuplicateIcon, ArrowTopRightOnSquareIcon,
-  ChatBubbleBottomCenterTextIcon,
+  ChatBubbleBottomCenterTextIcon, CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
 import { profileAPI, cvDocumentAPI, applicationAPI } from '../services/ipc.js';
@@ -39,6 +39,9 @@ export default function CVLibrary({ onNavigate }) {
   const [editingProfile, setEditingProfile] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [editingCvDoc, setEditingCvDoc]   = useState(null);
+  const [selectMode, setSelectMode]       = useState(false);
+  const [selectedDocIds, setSelectedDocIds] = useState(new Set());
+  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => { loadAll(); }, []);
@@ -46,6 +49,30 @@ export default function CVLibrary({ onNavigate }) {
   function selectProfile(id) {
     setSelectedId(id);
     storeId(id);
+    setSelectedDocIds(new Set());
+  }
+
+  function toggleSelectMode() {
+    setSelectMode(m => !m);
+    setSelectedDocIds(new Set());
+  }
+
+  function toggleDocSelected(id) {
+    setSelectedDocIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function setDocsSelected(ids, selected) {
+    setSelectedDocIds(prev => {
+      const next = new Set(prev);
+      for (const id of ids) {
+        if (selected) next.add(id); else next.delete(id);
+      }
+      return next;
+    });
   }
 
   async function loadAll() {
@@ -185,6 +212,34 @@ export default function CVLibrary({ onNavigate }) {
     onNavigate('assembly', { newDocument: true, profileId: profileId ?? undefined });
   }
 
+  // ── Bulk actions ──────────────────────────────────────────────────────────────
+
+  async function handleBulkMove(newProfileId) {
+    const ids = [...selectedDocIds];
+    try {
+      await cvDocumentAPI.batchMove(ids, newProfileId);
+      setSelectedDocIds(new Set());
+      await loadAll();
+      showToast(newProfileId ? `Moved ${ids.length} CV(s) to profile` : `Moved ${ids.length} CV(s) to unorganised`);
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  async function handleBulkDelete() {
+    const ids = [...selectedDocIds];
+    try {
+      await cvDocumentAPI.batchDelete(ids);
+      setSelectedDocIds(new Set());
+      await loadAll();
+      showToast(`Deleted ${ids.length} CV(s)`);
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      setBulkDeleteConfirm(false);
+    }
+  }
+
   // ── Derived data ─────────────────────────────────────────────────────────────
 
   const selectedProfile = profiles.find(p => p.id === selectedId) ?? null;
@@ -205,9 +260,17 @@ export default function CVLibrary({ onNavigate }) {
           <h1 className="cvlib-title">CV Library</h1>
           <p className="cvlib-subtitle">Organise your CVs into role profiles</p>
         </div>
-        <button className="btn btn-primary btn-sm btn-with-icon" onClick={() => handleNewCv(null)}>
-          <PlusIcon className="icon" /> New CV
-        </button>
+        <div className="cvlib-header-actions">
+          <button
+            className={`btn btn-sm btn-with-icon ${selectMode ? 'btn-secondary' : 'btn-ghost'}`}
+            onClick={toggleSelectMode}
+          >
+            <CheckCircleIcon className="icon" /> {selectMode ? 'Cancel selection' : 'Select'}
+          </button>
+          <button className="btn btn-primary btn-sm btn-with-icon" onClick={() => handleNewCv(null)}>
+            <PlusIcon className="icon" /> New CV
+          </button>
+        </div>
       </div>
 
       <div className="cvlib-body">
@@ -271,6 +334,12 @@ export default function CVLibrary({ onNavigate }) {
               onEditDetails={setEditingCvDoc}
               onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title, linkedApps: applications.filter(a => a.cv_document_id === id).length })}
               onNewCv={() => handleNewCv(null)}
+              selectMode={selectMode}
+              selectedDocIds={selectedDocIds}
+              onToggleDocSelected={toggleDocSelected}
+              onSetDocsSelected={setDocsSelected}
+              onBulkMove={handleBulkMove}
+              onBulkDelete={() => setBulkDeleteConfirm(true)}
             />
           ) : selectedProfile ? (
             <ProfileDetail
@@ -287,6 +356,12 @@ export default function CVLibrary({ onNavigate }) {
               onEditDetails={setEditingCvDoc}
               onDeleteDoc={(id, title) => setDeleteConfirm({ type: 'doc', id, name: title, linkedApps: applications.filter(a => a.cv_document_id === id).length })}
               onNewCv={() => handleNewCv(selectedProfile.id)}
+              selectMode={selectMode}
+              selectedDocIds={selectedDocIds}
+              onToggleDocSelected={toggleDocSelected}
+              onSetDocsSelected={setDocsSelected}
+              onBulkMove={handleBulkMove}
+              onBulkDelete={() => setBulkDeleteConfirm(true)}
             />
           ) : (
             <div className="cvlib-no-selection">
@@ -327,13 +402,24 @@ export default function CVLibrary({ onNavigate }) {
         />
       )}
 
+      {bulkDeleteConfirm && (
+        <BulkDeleteConfirmModal
+          count={selectedDocIds.size}
+          linkedApps={applications.filter(a => selectedDocIds.has(a.cv_document_id)).length}
+          onConfirm={handleBulkDelete}
+          onCancel={() => setBulkDeleteConfirm(false)}
+        />
+      )}
+
     </div>
   );
 }
 
 // ── UnorganisedDetail ─────────────────────────────────────────────────────────
 
-function UnorganisedDetail({ docs, profiles, onOpen, onClone, onMove, onEditDetails, onDeleteDoc, onNewCv }) {
+function UnorganisedDetail({ docs, profiles, onOpen, onClone, onMove, onEditDetails, onDeleteDoc, onNewCv,
+                              selectMode, selectedDocIds, onToggleDocSelected, onSetDocsSelected, onBulkMove, onBulkDelete }) {
+  const docIds = docs.map(d => d.id);
   return (
     <section className="cvlib-profile-detail">
       <div className="cvlib-profile-detail-header">
@@ -342,6 +428,17 @@ function UnorganisedDetail({ docs, profiles, onOpen, onClone, onMove, onEditDeta
           <p className="cvlib-profile-detail-desc">These CVs are not assigned to any profile.</p>
         </div>
       </div>
+      {selectMode && (
+        <BulkToolbar
+          ids={docIds}
+          selectedDocIds={selectedDocIds}
+          onSetDocsSelected={onSetDocsSelected}
+          profiles={profiles}
+          currentProfileId={null}
+          onBulkMove={onBulkMove}
+          onBulkDelete={onBulkDelete}
+        />
+      )}
       <ul className="cvlib-doc-list">
         {docs.map(doc => (
           <CvDocRow
@@ -355,6 +452,9 @@ function UnorganisedDetail({ docs, profiles, onOpen, onClone, onMove, onEditDeta
             onMove={onMove}
             onEditDetails={() => onEditDetails(doc)}
             onDelete={() => onDeleteDoc(doc.id, doc.title)}
+            selectMode={selectMode}
+            selected={selectedDocIds.has(doc.id)}
+            onToggleSelect={() => onToggleDocSelected(doc.id)}
           />
         ))}
       </ul>
@@ -368,7 +468,9 @@ function UnorganisedDetail({ docs, profiles, onOpen, onClone, onMove, onEditDeta
 // ── ProfileDetail ─────────────────────────────────────────────────────────────
 
 function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, onDelete,
-                         onSetPrimary, onOpen, onClone, onMove, onEditDetails, onDeleteDoc, onNewCv }) {
+                         onSetPrimary, onOpen, onClone, onMove, onEditDetails, onDeleteDoc, onNewCv,
+                         selectMode, selectedDocIds, onToggleDocSelected, onSetDocsSelected, onBulkMove, onBulkDelete }) {
+  const docIds = [...primaryDocs, ...variantDocs].map(d => d.id);
   return (
     <section className="cvlib-profile-detail">
       <div className="cvlib-profile-detail-header">
@@ -388,6 +490,18 @@ function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, on
         </div>
       </div>
 
+      {selectMode && (
+        <BulkToolbar
+          ids={docIds}
+          selectedDocIds={selectedDocIds}
+          onSetDocsSelected={onSetDocsSelected}
+          profiles={profiles}
+          currentProfileId={profile.id}
+          onBulkMove={onBulkMove}
+          onBulkDelete={onBulkDelete}
+        />
+      )}
+
       <div className="cvlib-subsection">
         <h3 className="cvlib-subsection-heading">
           <StarSolid className="cvlib-star-icon" /> Primary CV
@@ -404,7 +518,10 @@ function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, on
                 profiles={profiles}
                 onOpen={() => onOpen(doc.id)} onClone={() => onClone(doc)}
                 onMove={onMove} onEditDetails={() => onEditDetails(doc)}
-                onDelete={() => onDeleteDoc(doc.id, doc.title)} />
+                onDelete={() => onDeleteDoc(doc.id, doc.title)}
+                selectMode={selectMode}
+                selected={selectedDocIds.has(doc.id)}
+                onToggleSelect={() => onToggleDocSelected(doc.id)} />
             ))}
           </ul>
         )}
@@ -424,7 +541,10 @@ function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, on
                 onSetPrimary={() => onSetPrimary(profile.id, doc.id)}
                 onOpen={() => onOpen(doc.id)} onClone={() => onClone(doc)}
                 onMove={onMove} onEditDetails={() => onEditDetails(doc)}
-                onDelete={() => onDeleteDoc(doc.id, doc.title)} />
+                onDelete={() => onDeleteDoc(doc.id, doc.title)}
+                selectMode={selectMode}
+                selected={selectedDocIds.has(doc.id)}
+                onToggleSelect={() => onToggleDocSelected(doc.id)} />
             ))}
           </ul>
         )}
@@ -437,9 +557,74 @@ function ProfileDetail({ profile, primaryDocs, variantDocs, profiles, onEdit, on
   );
 }
 
+// ── BulkToolbar ───────────────────────────────────────────────────────────────
+
+function BulkToolbar({ ids, selectedDocIds, onSetDocsSelected, profiles, currentProfileId, onBulkMove, onBulkDelete }) {
+  const selectedInList = ids.filter(id => selectedDocIds.has(id));
+  const allSelected = ids.length > 0 && selectedInList.length === ids.length;
+  const someSelected = selectedInList.length > 0 && !allSelected;
+  const checkboxRef = useRef(null);
+
+  useEffect(() => {
+    if (checkboxRef.current) checkboxRef.current.indeterminate = someSelected;
+  }, [someSelected]);
+
+  const moveTargets = (profiles || []).filter(p => p.id !== currentProfileId);
+
+  function handleMoveChange(e) {
+    const val = e.target.value;
+    if (!val) return;
+    onBulkMove(val === 'none' ? null : parseInt(val));
+    e.target.value = '';
+  }
+
+  return (
+    <div className="cvlib-bulk-toolbar">
+      <label className="cvlib-bulk-select-all">
+        <input
+          ref={checkboxRef}
+          type="checkbox"
+          className="cvlib-doc-checkbox"
+          checked={allSelected}
+          onChange={e => onSetDocsSelected(ids, e.target.checked)}
+          aria-label="Select all CVs in this list"
+        />
+        {selectedDocIds.size > 0 ? `${selectedDocIds.size} selected` : 'Select all'}
+      </label>
+
+      <div className="cvlib-bulk-actions">
+        <select
+          className="cvlib-move-select"
+          defaultValue=""
+          onChange={handleMoveChange}
+          disabled={selectedDocIds.size === 0}
+          title="Move selected CVs to a different profile"
+          aria-label="Move selected CVs to a different profile"
+        >
+          <option value="" disabled>Move to…</option>
+          {moveTargets.map(p => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+          {currentProfileId != null && (
+            <option value="none">Unorganised (remove from profile)</option>
+          )}
+        </select>
+        <button
+          className="btn btn-danger btn-sm btn-with-icon"
+          onClick={onBulkDelete}
+          disabled={selectedDocIds.size === 0}
+        >
+          <TrashIcon className="icon" /> Delete selected
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── CvDocRow ──────────────────────────────────────────────────────────────────
 
-function CvDocRow({ doc, isPrimary, showSetPrimary, onSetPrimary, onOpen, onClone, onMove, onEditDetails, onDelete, profiles }) {
+function CvDocRow({ doc, isPrimary, showSetPrimary, onSetPrimary, onOpen, onClone, onMove, onEditDetails, onDelete, profiles,
+                    selectMode, selected, onToggleSelect }) {
   const updatedDate = doc.updated_at
     ? new Date(doc.updated_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
     : '';
@@ -458,6 +643,15 @@ function CvDocRow({ doc, isPrimary, showSetPrimary, onSetPrimary, onOpen, onClon
   return (
     <li className={`cvlib-doc-row${isPrimary ? ' is-base' : ''}`}>
       <div className="cvlib-doc-info">
+        {selectMode && (
+          <input
+            type="checkbox"
+            className="cvlib-doc-checkbox"
+            checked={selected}
+            onChange={onToggleSelect}
+            aria-label={`Select ${doc.title || 'Untitled CV'}`}
+          />
+        )}
         {isPrimary && <StarSolid className="cvlib-doc-star" aria-hidden="true" />}
         <span className="cvlib-doc-title" title={doc.title || 'Untitled CV'}>
           {doc.title || 'Untitled CV'}
@@ -469,49 +663,51 @@ function CvDocRow({ doc, isPrimary, showSetPrimary, onSetPrimary, onOpen, onClon
         )}
         {updatedDate && <span className="cvlib-doc-date">Updated {updatedDate}</span>}
       </div>
-      <div className="cvlib-doc-actions">
-        {showSetPrimary && (
-          <button className="cvlib-icon-btn" onClick={onSetPrimary} title="Set as primary CV"
-                  aria-label="Set as primary CV">
-            <StarIcon className="cvlib-icon-btn-icon" />
+      {!selectMode && (
+        <div className="cvlib-doc-actions">
+          {showSetPrimary && (
+            <button className="cvlib-icon-btn" onClick={onSetPrimary} title="Set as primary CV"
+                    aria-label="Set as primary CV">
+              <StarIcon className="cvlib-icon-btn-icon" />
+            </button>
+          )}
+
+          {(moveTargets.length > 0 || doc.profile_id) && (
+            <select
+              className="cvlib-move-select"
+              defaultValue=""
+              onChange={handleMoveChange}
+              title="Move to a different profile"
+              aria-label="Move to a different profile"
+            >
+              <option value="" disabled>Move to…</option>
+              {moveTargets.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+              {doc.profile_id && (
+                <option value="none">Unorganised (remove from profile)</option>
+              )}
+            </select>
+          )}
+
+          <button className="cvlib-icon-btn" onClick={onEditDetails} title="Edit name and notes"
+                  aria-label="Edit name and notes">
+            <PencilIcon className="cvlib-icon-btn-icon" />
           </button>
-        )}
-
-        {(moveTargets.length > 0 || doc.profile_id) && (
-          <select
-            className="cvlib-move-select"
-            defaultValue=""
-            onChange={handleMoveChange}
-            title="Move to a different profile"
-            aria-label="Move to a different profile"
-          >
-            <option value="" disabled>Move to…</option>
-            {moveTargets.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-            {doc.profile_id && (
-              <option value="none">Unorganised (remove from profile)</option>
-            )}
-          </select>
-        )}
-
-        <button className="cvlib-icon-btn" onClick={onEditDetails} title="Edit name and notes"
-                aria-label="Edit name and notes">
-          <PencilIcon className="cvlib-icon-btn-icon" />
-        </button>
-        <button className="cvlib-icon-btn" onClick={onOpen} title="Open in Assembly"
-                aria-label="Open in Assembly">
-          <ArrowTopRightOnSquareIcon className="cvlib-icon-btn-icon" />
-        </button>
-        <button className="cvlib-icon-btn" onClick={onClone} title="Create a copy"
-                aria-label="Create a copy">
-          <DocumentDuplicateIcon className="cvlib-icon-btn-icon" />
-        </button>
-        <button className="cvlib-icon-btn cvlib-icon-btn-danger" onClick={onDelete}
-                title="Delete this CV" aria-label="Delete this CV">
-          <TrashIcon className="cvlib-icon-btn-icon" />
-        </button>
-      </div>
+          <button className="cvlib-icon-btn" onClick={onOpen} title="Open in Assembly"
+                  aria-label="Open in Assembly">
+            <ArrowTopRightOnSquareIcon className="cvlib-icon-btn-icon" />
+          </button>
+          <button className="cvlib-icon-btn" onClick={onClone} title="Create a copy"
+                  aria-label="Create a copy">
+            <DocumentDuplicateIcon className="cvlib-icon-btn-icon" />
+          </button>
+          <button className="cvlib-icon-btn cvlib-icon-btn-danger" onClick={onDelete}
+                  title="Delete this CV" aria-label="Delete this CV">
+            <TrashIcon className="cvlib-icon-btn-icon" />
+          </button>
+        </div>
+      )}
     </li>
   );
 }
@@ -639,6 +835,32 @@ function DeleteConfirmModal({ name, isProfile, linkedApps = 0, onConfirm, onCanc
           <p className="modal-body-text modal-warning">
             This CV is linked to {linkedApps} application{linkedApps !== 1 ? 's' : ''}.
             Deleting it will remove the link — the application record will remain but without a CV attached.
+          </p>
+        )}
+        <div className="modal-actions">
+          <button className="btn btn-ghost btn-sm" onClick={onCancel}>Cancel</button>
+          <button className="btn btn-danger btn-sm" onClick={onConfirm}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── BulkDeleteConfirmModal ────────────────────────────────────────────────────
+
+function BulkDeleteConfirmModal({ count, linkedApps, onConfirm, onCancel }) {
+  const boxRef = useRef(null);
+  useFocusTrap(true, boxRef);
+  return (
+    <div className="modal-overlay" onClick={onCancel} onKeyDown={e => e.key === 'Escape' && onCancel()}>
+      <div className="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="bulk-delete-modal-title"
+           ref={boxRef} onClick={e => e.stopPropagation()}>
+        <h2 className="modal-title" id="bulk-delete-modal-title">Delete {count} CV{count !== 1 ? 's' : ''}?</h2>
+        <p className="modal-body-text">This cannot be undone.</p>
+        {linkedApps > 0 && (
+          <p className="modal-body-text modal-warning">
+            {linkedApps} of these CV{linkedApps !== 1 ? 's are' : ' is'} linked to an application.
+            Deleting {linkedApps !== 1 ? 'them' : 'it'} will remove the link — the application record will remain but without a CV attached.
           </p>
         )}
         <div className="modal-actions">
