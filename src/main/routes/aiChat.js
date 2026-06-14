@@ -4,6 +4,7 @@ const { Router } = require('express');
 const Anthropic   = require('@anthropic-ai/sdk');
 const db          = require('../db.js');
 const { buildReplacementMap, stripPII } = require('../piiUtils.js');
+const appKnowledge = require('../../shared/appKnowledge.json');
 
 const router = Router();
 
@@ -100,6 +101,10 @@ STRICT RULES — these override everything else:
    [[PERSONA: brief description of the reviewer perspective]]
    Example: [[PERSONA: HR Manager evaluating leadership and communication]]
    Then offer to proceed as a general CV reviewer if the user prefers no specific perspective.
+
+ABOUT THE CV FERRET APP — use this to answer questions about how the app works (separate from CV content advice):
+${appKnowledge.map(s => `- ${s.title}: ${s.body}`).join('\n')}
+- If the pool is empty, explain that you need pool entries to ground CV suggestions, and point the user to the Experience Pool page to add jobs and tasks.
 
 CANDIDATE'S EXPERIENCE POOL (anonymised):
 ${anonymisedPool || '(Pool is empty — the user has not added any experience yet.)'}
