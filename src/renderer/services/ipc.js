@@ -36,6 +36,9 @@ export const taskAPI = {
   updateJob: (jobId, employer, jobTitle, startDate, endDate, location, notes) =>
     api.request('PUT', `/jobs/${jobId}`, { employer, jobTitle, startDate, endDate, location, notes }),
 
+  deleteJob: (jobId) =>
+    api.request('DELETE', `/jobs/${jobId}`),
+
   getAllJobs: () =>
     api.request('GET', '/jobs'),
 
@@ -50,6 +53,12 @@ export const taskAPI = {
 
   deleteTask: (taskId) =>
     api.request('DELETE', `/tasks/${taskId}`),
+
+  batchDeleteTasks: (ids) =>
+    api.request('POST', '/tasks/batch-delete', { ids }),
+
+  batchDeleteJobs: (ids) =>
+    api.request('POST', '/jobs/batch-delete', { ids }),
 
   reorderTasks: (jobId, taskIds) =>
     api.request('PUT', `/jobs/${jobId}/tasks-order`, { taskIds }),
@@ -113,7 +122,8 @@ export const referenceAPI = {
   getAll: () => api.request('GET', '/references'),
   update: (id, jobId, tags, notes) =>
     api.request('PUT', `/references/${id}`, { jobId, tags, notes }),
-  delete: (id) => api.request('DELETE', `/references/${id}`),
+  delete:      (id)  => api.request('DELETE', `/references/${id}`),
+  batchDelete: (ids) => api.request('POST',   '/references/batch-delete', { ids }),
   fileUrl: (id) => `${API_BASE}/references/${id}/file`,
   upload: (file, jobId, tags, notes) => {
     const form = new FormData();
@@ -149,18 +159,13 @@ export const applicationAPI = {
   },
   update:     (id, fields)    => api.request('PUT',    `/applications/${id}`, fields),
   delete:     (id)            => api.request('DELETE', `/applications/${id}`),
-  checkFiles: (id)            => api.request('GET',    `/applications/${id}/check-files`),
+  checkFiles:   (id)          => api.request('GET',    `/applications/${id}/check-files`),
+  batchDelete:  (ids)         => api.request('POST',   '/applications/batch-delete', { ids }),
 };
 
-export const compositionAPI = {
-  list: () => api.request('GET', '/compositions'),
-  get: (id) => api.request('GET', `/compositions/${id}`),
-  create: async (name, payload) => {
-    const { id } = await api.request('POST', '/compositions', { name, ...payload });
-    return id;
-  },
-  update: (id, name, payload) => api.request('PUT', `/compositions/${id}`, { name, ...payload }),
-  delete: (id) => api.request('DELETE', `/compositions/${id}`),
+export const impactAPI = {
+  jobs:  (ids) => api.request('GET', `/impact/jobs?ids=${ids.join(',')}`),
+  tasks: (ids) => api.request('GET', `/impact/tasks?ids=${ids.join(',')}`),
 };
 
 export const generationAPI = {
@@ -227,7 +232,9 @@ export const profileAPI = {
   get:        (id)                  => api.request('GET',    `/profiles/${id}`),
   create:     (name, description)   => api.request('POST',   '/profiles', { name, description }),
   update:     (id, name, description) => api.request('PUT',  `/profiles/${id}`, { name, description }),
-  delete:     (id)                  => api.request('DELETE', `/profiles/${id}`),
+  delete:       (id)                => api.request('DELETE', `/profiles/${id}`),
+  batchDelete:  (ids, { deleteCvDocuments = false } = {}) =>
+    api.request('POST', '/profiles/batch-delete', { ids, deleteCvDocuments }),
   setBaseCv:  (profileId, cvDocumentId) =>
     api.request('PUT', `/profiles/${profileId}/set-base-cv`, { cv_document_id: cvDocumentId }),
 };
@@ -237,7 +244,9 @@ export const cvDocumentAPI = {
   get:        (id)             => api.request('GET',    `/cv-documents/${id}`),
   create:     (fields)         => api.request('POST',   '/cv-documents', fields),
   update:     (id, fields)     => api.request('PUT',    `/cv-documents/${id}`, fields),
-  delete:     (id)             => api.request('DELETE', `/cv-documents/${id}`),
+  delete:       (id)           => api.request('DELETE', `/cv-documents/${id}`),
+  batchDelete:  (ids)          => api.request('POST',   '/cv-documents/batch-delete', { ids }),
+  batchMove:    (ids, profileId) => api.request('POST', '/cv-documents/batch-move', { ids, profileId }),
   exportPdf:  (id)             => api.request('POST',   `/cv-documents/${id}/export-pdf`, {}),
   exportDocx: (id)             => api.request('POST',   `/cv-documents/${id}/export-docx`, {}),
 };

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   DocumentArrowDownIcon, DocumentDuplicateIcon,
   SparklesIcon, Bars3Icon, CheckIcon, LinkIcon,
-  ArrowLeftIcon,
+  ArrowLeftIcon, TrashIcon,
 } from '@heroicons/react/24/outline';
 import { useAssemblyStore } from '../../stores/assemblyStore.js';
 import { usePoolStore }     from '../../stores/poolStore.js';
@@ -113,6 +113,7 @@ export default function AssemblyToolbar({
   onSave,
   onSaveAs,
   onExport,
+  onDelete,
   onLinkToApp,
   onProfileChange,
   profiles = [],
@@ -197,6 +198,15 @@ export default function AssemblyToolbar({
               <SparklesIcon className="icon" /> AI
             </button>
           )}
+
+          <button
+            className="btn btn-ghost btn-sm btn-with-icon asm-delete-btn"
+            onClick={onDelete}
+            title="Delete this CV"
+            aria-label="Delete this CV"
+          >
+            <TrashIcon className="icon" /> Delete
+          </button>
         </div>
       </div>
 

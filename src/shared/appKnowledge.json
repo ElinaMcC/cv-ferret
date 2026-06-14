@@ -1,0 +1,37 @@
+[
+  {
+    "id": "experience-pool",
+    "title": "Experience Pool",
+    "body": "Your Experience Pool is your library of jobs and the tasks (bullet points) you did in each one. Build it up on the Experience Pool page — add jobs, then add tasks under each job."
+  },
+  {
+    "id": "versions",
+    "title": "Task versions",
+    "body": "Each task can have multiple versions — different ways of phrasing the same bullet point, tailored to different kinds of roles. One version is marked as the default, which is used when you add the task to a CV. You can switch between versions for a task in the Pool Drawer while editing a CV."
+  },
+  {
+    "id": "profiles",
+    "title": "Profiles",
+    "body": "A profile is a named variant of your CV — for example 'Tech Lead' or 'Data Science' — used to group together CVs aimed at a particular kind of role. Profiles are managed in the CV Library."
+  },
+  {
+    "id": "cover-letters",
+    "title": "Cover letters",
+    "body": "Cover letters aren't stored separately — each job application in the Application Tracker has its own cover letter, which you can write, generate with AI, or copy from a previous application."
+  },
+  {
+    "id": "pool-drawer",
+    "title": "The Pool Drawer",
+    "body": "The Pool Drawer is the panel that slides out in Assembly (the CV editor) showing your whole Experience Pool. Use it to toggle tasks in or out of the CV you're building, and to switch which version of a task is used."
+  },
+  {
+    "id": "app-sections",
+    "title": "Finding your way around",
+    "body": "The sidebar has these sections: Home (your dashboard), Experience Pool, Education & Skills, Personal Details, CV Library, Assembly (the CV editor), Reference Letters, Application Tracker, and Settings."
+  },
+  {
+    "id": "getting-started",
+    "title": "Getting started",
+    "body": "If you're new, the suggested order is: fill in Personal Details, build up your Experience Pool with jobs and tasks, add Education & Skills, then create a CV in CV Library/Assembly, and track applications in the Application Tracker."
+  }
+]

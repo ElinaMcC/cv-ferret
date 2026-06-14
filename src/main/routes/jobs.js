@@ -32,6 +32,13 @@ router.put('/jobs/:jobId', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.delete('/jobs/:jobId', (req, res) => {
+  try {
+    db.deleteJob(parseInt(req.params.jobId));
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.get('/jobs/:jobId/tasks', (req, res) => {
   try { res.json(db.getTasksByJob(parseInt(req.params.jobId))); }
   catch (err) { res.status(500).json({ error: err.message }); }
@@ -41,6 +48,24 @@ router.post('/tasks', (req, res) => {
   try {
     const id = db.createTask(req.body.jobId);
     res.json({ id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/jobs/batch-delete', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    db.batchDeleteJobs(ids);
+    res.json({ success: true, deleted: ids.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+router.post('/tasks/batch-delete', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    db.batchDeleteTasks(ids);
+    res.json({ success: true, deleted: ids.length });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 

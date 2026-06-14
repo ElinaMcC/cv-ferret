@@ -65,6 +65,20 @@ router.put('/references/:id', (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+router.post('/references/batch-delete', (req, res) => {
+  try {
+    const ids = (req.body.ids || []).map(Number).filter(Boolean);
+    if (!ids.length) return res.status(400).json({ error: 'No ids provided' });
+    const storedNames = db.batchDeleteReferences(ids);
+    const refDir = db.getRefLettersDir();
+    storedNames.forEach(name => {
+      const filePath = path.join(refDir, name);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    });
+    res.json({ success: true, deleted: ids.length });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 router.delete('/references/:id', (req, res) => {
   try {
     const storedName = db.deleteReference(parseInt(req.params.id));

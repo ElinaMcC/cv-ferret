@@ -63,8 +63,8 @@ if (process.env.NODE_ENV === 'production') {
 app.use('/api', require('./routes/jobs'));
 app.use('/api', require('./routes/education'));
 app.use('/api', require('./routes/personal'));
-app.use('/api', require('./routes/compositions'));
 app.use('/api', require('./routes/applications'));
+app.use('/api', require('./routes/impact'));
 app.use('/api', require('./routes/references'));
 app.use('/api', require('./routes/settings'));
 app.use('/api', require('./routes/ai'));

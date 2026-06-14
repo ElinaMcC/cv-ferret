@@ -512,7 +512,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
             <h3 id="export-modal-title">Export Files</h3>
             <p className="at-modal-desc">
               Saves CV and cover letter as DOCX and PDF into a new sub-folder named after this
-              application. The CV uses the linked composition; the cover letter uses the saved text.
+              application. The CV uses the linked CV document; the cover letter uses the saved text.
               <br /><br />
               <strong>Tip:</strong> Set a default folder once in <strong>Settings → Export Path</strong> so you don't have to enter it each time.
             </p>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   HomeIcon, BriefcaseIcon, AcademicCapIcon, UserIcon,
   BookOpenIcon, DocumentTextIcon, EnvelopeOpenIcon,
-  ClipboardDocumentListIcon, Cog6ToothIcon, ArrowDownTrayIcon,
+  ClipboardDocumentListIcon, Cog6ToothIcon, ArrowDownTrayIcon, QuestionMarkCircleIcon,
   ChevronLeftIcon, ChevronRightIcon, SunIcon, MoonIcon,
 } from '@heroicons/react/24/outline';
 
@@ -16,6 +16,7 @@ import ApplicationTracker from './components/ApplicationTracker';
 import Dashboard          from './components/Dashboard';
 import CVLibrary          from './components/CVLibrary';
 import ImportPage         from './components/ImportPage';
+import HelpPage           from './components/HelpPage';
 import { ToastProvider }       from './contexts/ToastContext';
 import { AppSettingsProvider } from './contexts/AppSettingsContext';
 import './App.css';
@@ -30,6 +31,7 @@ const NAV = [
   { id: 'references',      label: 'Reference Letters',   Icon: EnvelopeOpenIcon },
   { id: 'applications',    label: 'Application Tracker', Icon: ClipboardDocumentListIcon },
   { id: 'import',          label: 'Import',              Icon: ArrowDownTrayIcon },
+  { id: 'help',            label: 'Help',                Icon: QuestionMarkCircleIcon },
   { id: 'settings',        label: 'Settings',            Icon: Cog6ToothIcon },
 ];
 
@@ -154,6 +156,7 @@ export default function App() {
             )}
             {currentView === 'references'      && <ReferencePage />}
             {currentView === 'import'          && <ImportPage onNavigate={navigate} />}
+            {currentView === 'help'            && <HelpPage />}
             {currentView === 'settings'        && <Settings />}
             {currentView === 'applications'    && (
               <ApplicationTracker
