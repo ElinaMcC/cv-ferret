@@ -16,6 +16,7 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
   SparklesIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 
 export const Icon = {
@@ -32,6 +33,7 @@ export const Icon = {
   Warning: ExclamationTriangleIcon,
   Info: InformationCircleIcon,
   Sparkles: SparklesIcon,
+  Import: ArrowDownTrayIcon,
 };
 
 // Icon sizing presets (use with className="icon icon-sm" etc.)

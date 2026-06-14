@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { educationAPI } from '../services/ipc';
 import { useToast } from '../contexts/ToastContext';
 import { Icon } from '../utils/icons';
-import ImportModal from './ImportModal';
 import './EducationPage.css';
 
 const CEFR_LEVELS = [
@@ -284,13 +283,12 @@ function LanguagesSection({ languages, onAdd, onRemove }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
-export default function EducationPage() {
+export default function EducationPage({ onNavigate }) {
   const [education, setEducation] = useState([]);
   const [training, setTraining] = useState([]);
   const [skills, setSkills] = useState([]);
   const [languages, setLanguages] = useState([]);
   const [error, setError] = useState('');
-  const [showImport, setShowImport] = useState(false);
   const showToast = useToast();
 
   useEffect(() => { load(); }, []);
@@ -378,8 +376,9 @@ export default function EducationPage() {
     <div className="education-page">
       <div className="edu-page-header">
         <h1>Education &amp; Skills</h1>
-        <button className="btn btn-secondary btn-sm" onClick={() => setShowImport(true)}>
-          Import JSON
+        <button className="btn btn-secondary btn-sm btn-with-icon" onClick={() => onNavigate('import')}>
+          <Icon.Import className="icon" />
+          Import →
         </button>
       </div>
       {error && <div className="edu-error">{error}</div>}
@@ -412,22 +411,6 @@ export default function EducationPage() {
         onRemove={handleRemoveLanguage}
       />
 
-      {showImport && (
-        <ImportModal
-          type="education"
-          onClose={() => setShowImport(false)}
-          onSuccess={result => {
-            setShowImport(false);
-            const parts = [];
-            if (result.education) parts.push(`${result.education} education ${result.education === 1 ? 'entry' : 'entries'}`);
-            if (result.training)  parts.push(`${result.training} training ${result.training === 1 ? 'entry' : 'entries'}`);
-            if (result.skillsAdded) parts.push(`${result.skillsAdded} new skill${result.skillsAdded !== 1 ? 's' : ''}`);
-            if (result.languages) parts.push(`${result.languages} language${result.languages !== 1 ? 's' : ''}`);
-            showToast(`Imported: ${parts.join(', ') || 'nothing new'}.`);
-            load();
-          }}
-        />
-      )}
     </div>
   );
 }

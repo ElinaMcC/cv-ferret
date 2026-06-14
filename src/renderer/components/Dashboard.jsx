@@ -53,6 +53,14 @@ export default function Dashboard({ onNavigate }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
   const [showFlow, setShowFlow] = useState(false);
+  const [importInviteDismissed, setImportInviteDismissed] = useState(
+    () => localStorage.getItem('importInviteDismissed') === 'true'
+  );
+
+  function dismissImportInvite() {
+    localStorage.setItem('importInviteDismissed', 'true');
+    setImportInviteDismissed(true);
+  }
 
   useEffect(() => {
     dashboardAPI.getSummary()
@@ -114,6 +122,25 @@ export default function Dashboard({ onNavigate }) {
           and tracking job applications — all on your own machine.
         </p>
       </div>
+
+      {/* Import invitation — shown until the user has added any experience */}
+      {stats.jobCount === 0 && !importInviteDismissed && (
+        <section className="db-card db-import-invite" aria-labelledby="import-invite-heading">
+          <button
+            className="db-import-invite-dismiss"
+            onClick={dismissImportInvite}
+            aria-label="Dismiss"
+          >×</button>
+          <h2 id="import-invite-heading">Already have a CV?</h2>
+          <p className="db-import-invite-text">
+            Get started in minutes — upload your existing CV and CV Ferret will pull out your
+            jobs, education, and skills automatically.
+          </p>
+          <button className="btn btn-primary" onClick={() => onNavigate('import')}>
+            Import your CV →
+          </button>
+        </section>
+      )}
 
       {/* Setup checklist — shown while any item is incomplete */}
       {incomplete.length > 0 && (

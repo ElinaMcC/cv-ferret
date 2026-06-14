@@ -3,13 +3,11 @@ import { taskAPI, generationAPI } from '../services/ipc';
 import { useToast } from '../contexts/ToastContext';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 import ExperienceForm from './ExperienceForm';
-import ImportModal from './ImportModal';
 import { Icon } from '../utils/icons';
 import './ExperiencePool.css';
 
-export default function ExperiencePool() {
+export default function ExperiencePool({ onNavigate }) {
   const { aiEnabled } = useAppSettings();
-  const [showImport, setShowImport] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [formMode, setFormMode] = useState(null); // 'new-task' | 'add-version' | 'edit-version' | 'edit-job'
@@ -326,10 +324,10 @@ export default function ExperiencePool() {
           )}
           <button
             className="btn btn-secondary btn-with-icon"
-            onClick={() => setShowImport(true)}
+            onClick={() => onNavigate('import')}
           >
-            <Icon.Add className="icon" />
-            Import JSON
+            <Icon.Import className="icon" />
+            Import →
           </button>
           <button
             className="btn btn-primary btn-with-icon"
@@ -645,18 +643,6 @@ export default function ExperiencePool() {
         </div>
       ))}
     </div>
-
-    {showImport && (
-      <ImportModal
-        type="experience"
-        onClose={() => setShowImport(false)}
-        onSuccess={result => {
-          setShowImport(false);
-          showToast(`Imported ${result.jobs} job${result.jobs !== 1 ? 's' : ''} and ${result.tasks} task${result.tasks !== 1 ? 's' : ''}.`);
-          loadJobs();
-        }}
-      />
-    )}
 
     {confirmDelete && (
       <ConfirmDialog

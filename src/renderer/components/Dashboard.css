@@ -43,6 +43,36 @@
   margin-bottom: 14px;
 }
 
+/* ── Import invitation ───────────────────────────────────────────────────────── */
+
+.db-import-invite {
+  position: relative;
+  border-left: 3px solid var(--color-primary);
+}
+
+.db-import-invite-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  max-width: 520px;
+}
+
+.db-import-invite-dismiss {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.db-import-invite-dismiss:hover { color: var(--text-primary); }
+
 /* ── Setup checklist ─────────────────────────────────────────────────────────── */
 
 .db-setup { border-left: 3px solid var(--color-primary); }

@@ -136,8 +136,8 @@ export default function App() {
 
           <main className="content" id="main-content">
             {currentView === 'home'            && <Dashboard onNavigate={navigate} />}
-            {currentView === 'experience-pool' && <ExperiencePool />}
-            {currentView === 'education'       && <EducationPage />}
+            {currentView === 'experience-pool' && <ExperiencePool onNavigate={navigate} />}
+            {currentView === 'education'       && <EducationPage onNavigate={navigate} />}
             {currentView === 'personal'        && <PersonalDetails />}
             {currentView === 'cv-library'      && <CVLibrary onNavigate={navigate} />}
             {currentView === 'assembly'        && (
