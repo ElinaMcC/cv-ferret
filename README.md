@@ -91,6 +91,12 @@ Browser (React/Vite)  ←→  Express API (Node.js)  ←→  JSON files on disk
 - **Recent CVs** — last 5 modified CVs with direct "Open" links into the Assembly
 - **Quick actions**: New CV, CV Library, Experience Pool, Application Tracker, Settings
 
+### Import
+- Primary onboarding entry point for bringing an existing CV into CV Ferret
+- **Extract with AI** (requires AI features) — upload a `.docx`, `.pdf`, `.md`, or `.txt` file, or paste CV text; Claude extracts personal details, jobs, tasks, education, training, skills, and languages into an editable preview before anything is saved
+- **Import manually** — works without AI: download JSON templates for experience and education/skills, fill them in with any tool, and upload them section by section
+- Reachable from the sidebar, the Dashboard's "Already have a CV?" card (shown until you have at least one job), and "Import →" links on the Experience Pool and Education & Skills pages
+
 ### Experience Pool
 - Add jobs with employer, title, location, start/end dates, notes
 - Add tasks (bullet points) to each job; drag to reorder
@@ -140,7 +146,7 @@ The unified CV editor, opened from the CV Library, the Dashboard, or the Applica
 - **Start from skeleton** — generates a document from your Experience Pool: job headings with empty task areas. Use the pool drawer to insert the tasks you need. Requires jobs in your pool.
 - **Pre-fill from pool** — same structure, but with all default task versions already inserted as a starting point to trim down. Requires jobs in your pool.
 - **Copy a saved draft** — clones a CV you've previously built in the app. Only CVs created in CV Ferret appear here, not external files. Disabled until you have at least one saved draft.
-- **Import from Markdown** — import a `.md` file and open it as a new CV document; useful for agent-generated drafts. See [Importing a CV from Markdown](#importing-a-cv-from-markdown) for structure recommendations and limitations.
+- A hint in the dialog links to the [Import page](#import) for bringing an existing CV file into the Experience Pool
 
 **Editing:**
 - TipTap rich-text editor with headings, bullet lists, and standard formatting
@@ -228,7 +234,8 @@ src/
 │       ├── ai.js                  — AI version generation and CV assembly analysis
 │       ├── aiChat.js              — Conversational AI assistant (Assembly chat panel)
 │       ├── documents.js           — Legacy document editor (retained for data compatibility)
-│       └── importExport.js        — Dashboard summary, import, export, backup/restore
+│       ├── import.js              — Import page: text extraction, AI extraction, import-all
+│       └── importExport.js        — Dashboard summary, JSON import, export, backup/restore
 └── renderer/
     ├── App.jsx / .css             — Navigation shell, theme toggle, context providers
     ├── index.jsx / .css           — React entry point
@@ -253,7 +260,8 @@ src/
     │   ├── ReferencePage.jsx / .css     — Reference letter library
     │   ├── ApplicationTracker.jsx / .css — Application tracking, cover letters, export
     │   ├── Settings.jsx / .css          — All settings
-    │   ├── ImportModal.jsx / .css        — JSON import modal
+    │   ├── ImportPage.jsx / .css         — Unified Import page (AI extraction + manual JSON)
+    │   ├── ImportPreview.jsx / .css      — Editable preview of AI-extracted CV data
     │   ├── HelpPage.jsx / .css           — In-app guide (renders src/shared/appKnowledge.json)
     │   └── InfoTip.jsx / .css            — Reusable inline help tooltip
     ├── contexts/
@@ -369,6 +377,16 @@ src/
 | DELETE | `/api/applications/:id` | Delete an application |
 | GET | `/api/applications/:id/check-files` | Check whether linked external CV file exists on disk |
 
+### Import
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/api/import/extract-text` | Extract plain text from an uploaded DOCX, PDF, or Markdown/text file |
+| POST | `/api/import/extract-with-ai` | Send CV text to Claude and return a structured preview (personal details, jobs, education, skills) |
+| POST | `/api/import/import-all` | Save a confirmed preview object across all sections in one go |
+| POST | `/api/import/experience` | Import jobs from JSON (manual path) |
+| POST | `/api/import/education` | Import education/skills from JSON (manual path) |
+
 ### Export, Backup & Dashboard
 
 | Method | Path | Purpose |
@@ -378,8 +396,6 @@ src/
 | POST | `/api/export/open-folder` | Open the export folder in Explorer |
 | GET | `/api/export/backup` | Get all data for backup download |
 | POST | `/api/export/restore` | Restore data from a backup |
-| POST | `/api/import/experience` | Import jobs from JSON |
-| POST | `/api/import/education` | Import education/skills from JSON |
 
 ---
 
@@ -403,21 +419,28 @@ All core features are complete and working. The app underwent a major refactor t
 
 ---
 
-## Importing your existing CV data
+## Importing your existing CV
 
-CV Ferret can import work history and education data from a JSON file — useful for
-getting your existing CV into the app without entering everything manually.
+The **Import** page is the canonical way to bring an existing CV into CV Ferret. It offers two paths:
 
-The recommended workflow is to use an AI tool (ChatGPT, Claude, or any other LLM)
-to convert your CV text into the required JSON format, then import the file.
+### Extract with AI (requires AI features)
 
-> **Important:** AI tools parse unstructured text with varying accuracy. Dates may be
-> misread, separate roles may be merged, or bullet points misattributed. Always review
-> imported data carefully before using it in your CV assembly.
+Upload a `.docx`, `.pdf`, `.md`, or `.txt` file — or paste your CV text directly — and Claude extracts everything into an editable preview: personal details, jobs (one entry per role, not per employer), tasks (one per bullet point), education, training, skills, and languages.
 
-### Experience import
+- Nothing is saved until you review and confirm the preview — every field is editable, and individual jobs, tasks, or entries can be deleted before import
+- Personal details are only overwritten if you explicitly tick a confirmation checkbox; otherwise existing details are kept
+- Imports are always **additive** — jobs, education, and skills are added alongside your existing data, never replacing it
+- The PII stripping that normally applies to AI calls is deliberately **not** applied here, since you are extracting your own data on purpose. A notice on the page explains this before you upload or paste anything
 
-In **Experience Pool**, click **Import JSON**. The file must contain a `jobs` array:
+> **Note:** AI extraction parses unstructured text with varying accuracy. Dates may be misread, roles may be merged or split incorrectly, and bullet points can be misattributed. Review the preview carefully before importing.
+
+### Import manually (no AI required)
+
+For users without AI enabled, the Import page provides a step-by-step manual path:
+
+- A link to **Personal Details** to fill those in directly
+- Downloadable JSON templates for **experience** (jobs and tasks) and **education & skills** (education, training, skills, languages)
+- File pickers to upload your completed JSON files, with a preview of what will be imported before confirming
 
 ```json
 {
@@ -441,14 +464,6 @@ In **Experience Pool**, click **Import JSON**. The file must contain a `jobs` ar
 }
 ```
 
-- `start_date` / `end_date`: `YYYY-MM-DD` format, or `null` for a current role
-- Each task becomes one bullet point in your pool
-- `tags` and `role_priorities` are optional — use empty arrays if unsure
-
-### Education & Skills import
-
-In **Education & Skills**, click **Import JSON**. All four sections are optional:
-
 ```json
 {
   "education": [
@@ -464,86 +479,11 @@ In **Education & Skills**, click **Import JSON**. All four sections are optional
 }
 ```
 
-- `end_date` for education/training is free text (`"Jun 2018"`, `"2023"`, etc.)
+- `start_date` / `end_date`: `YYYY-MM-DD` format, or `null` for a current role; education/training `end_date` is free text (`"Jun 2018"`, `"2023"`, etc.)
+- `tags` and `role_priorities` are optional — use empty arrays if unsure
 - Language `level` must be one of: `A1`, `A2`, `B1`, `B2`, `C1`, `C2`, `Native`
 - Skills are merged with existing ones (no duplicates); languages update the level if already present
-
-### Using an AI tool to extract your CV
-
-Paste your CV text into any LLM (Claude, ChatGPT, etc.) and ask it to convert your work history into the JSON format shown above. Include the field rules and the example structure in your prompt for best results. Always review the output carefully — dates can be misread and bullet points occasionally misattributed.
-
-Imports always **add to** your existing data rather than replacing it.
-
----
-
-## Importing a CV from Markdown
-
-In the Assembly, the **Load from Markdown** starting option accepts any `.md` or `.txt` file and opens it as a new CV document ready to edit.
-
-### What works and what doesn't
-
-Markdown imports as plain HTML into the TipTap editor. Headings, bullets, bold, and italic all come through correctly. However, the imported content has **no connection to the Experience Pool**:
-
-- Bullet points are plain text — they won't appear as checked items in the Pool drawer and won't be offered as building blocks after saving
-- The Pool drawer shows no checkmarks for imported content
-- To move tasks from an imported CV into your pool, add them manually via the Experience Pool page
-
-Everything else works normally — the AI panel, all export formats (Markdown, DOCX, PDF), and linking to an application.
-
-### Recommended Markdown structure
-
-For the best result, structure your Markdown CV to match the headings the app expects:
-
-```markdown
-# Your Name
-
-Email · Phone · Location · LinkedIn
-
-## Experience
-
-### Job Title
-Employer · Location · Jan 2022 – Present
-
-- First bullet point describing a responsibility or achievement
-- Second bullet point
-
-### Earlier Job Title
-Earlier Employer · Location · Jun 2019 – Dec 2021
-
-- Bullet point
-
-## Education
-
-### Degree Title
-Institution · Graduation year
-
-Notes about the qualification (optional)
-
-## Skills
-
-Python, SQL, Power BI, Tableau
-
-## Languages
-
-English (Native), German (C1)
-```
-
-**Key rules:**
-
-- `#` for your name (one only)
-- `##` for section headings — `Experience`, `Education`, `Skills`, `Languages` match the app's export template
-- `###` for each role or qualification — one heading per job
-- The **first line after a `###` heading** is treated as the employer/date line in exports — keep it as a single short line
-- Use `-` for task bullets under each role
-- One role per `###` heading — if you held multiple titles at the same employer, use separate headings
-
-### Generating a Markdown CV with an AI tool
-
-Ask any LLM to produce a CV in the structure above. A prompt like this works well:
-
-> Write a CV for the following work history in Markdown. Use `#` for the name, `##` for section headings (Experience, Education, Skills, Languages), and `###` for each job or qualification. Put employer and dates on the first line after each `###` heading. Use `-` for bullet points.
-
-Always review the output — dates can be misread and bullets occasionally misattributed across roles.
+- As with AI extraction, manual imports are always **additive**
 
 ---
 

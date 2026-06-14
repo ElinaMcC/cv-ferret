@@ -443,6 +443,7 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
           inline={!documentId}
           preselectedProfileId={preselectedProfileId}
           onCreated={handleDocumentCreated}
+          onNavigate={onNavigate}
           onCancel={() => {
             setShowStartDialog(false);
             if (!documentId) onNavigate?.('home');

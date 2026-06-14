@@ -78,25 +78,27 @@ Implemented on `feature/ai-chat-knowledge-base` (merged to main, commit `dbe01ca
 
 ---
 
-### Phase 5 — Navigation and integration
+### Phase 5 — Navigation and integration ✅ Complete
 
-**5.1** Dashboard import invitation card — shown when `stats.jobCount === 0`. Dismissible. "Already have a CV? Get started in minutes." Button navigates to Import page. Disappears once jobs exist.
+**5.1** Dashboard import invitation card — shown when `stats.jobCount === 0`. Dismissible (persisted via localStorage). "Already have a CV?" Button navigates to Import page. Disappears once jobs exist.
 
-**5.2** Experience Pool — retire ImportModal, replace button with link to Import page.
+**5.2** Experience Pool — retired ImportModal, replaced button with "Import →" link to Import page.
 
-**5.3** Education & Skills — same: retire ImportModal, replace with link.
+**5.3** Education & Skills — same: retired ImportModal, replaced with "Import →" link.
 
-**5.4** Delete `ImportModal.jsx` and `ImportModal.css` (or keep as internal utility if needed by manual JSON path — evaluate at build time).
+**5.4** Deleted `ImportModal.jsx` and `ImportModal.css` — the Import page's manual JSON path already covers this functionality.
 
 ---
 
-### Phase 6 — Polish and documentation
+### Phase 6 — Polish and documentation ✅ Complete
 
-**6.1** Update README: add Import page description near top of Features. Update the existing "Importing your existing CV data" section to reference the page.
+**6.1** Updated README: added an "Import" feature section near the top of Features, replaced the old "Importing your existing CV data" and "Importing a CV from Markdown" sections with a single "Importing your existing CV" section describing the AI extraction and manual JSON paths, added an API "Import" table, and updated File Structure (added `import.js`, `ImportPage.jsx/.css`, `ImportPreview.jsx/.css`; removed `ImportModal.jsx/.css`).
 
-**6.2** Update CLAUDE.md: Import page is canonical home for all imports; note deliberate PII exception for AI extraction.
+**6.2** Updated CLAUDE.md: added an "Import" section naming `ImportPage.jsx` as the canonical home for all imports.
 
-**6.3** StartNewCVDialog — remove the "Import from Markdown" mode (Import page is now the canonical entry point for bringing documents into the app). Add a hint or link in the dialog directing users who want to import an existing CV to the Import page.
+**6.3** StartNewCVDialog — removed the "Import from Markdown" mode entirely (along with the now-unused `marked` dependency); added a hint linking to the Import page for importing existing CV files.
+
+All six phases of the Import page are now complete.
 
 ---
 

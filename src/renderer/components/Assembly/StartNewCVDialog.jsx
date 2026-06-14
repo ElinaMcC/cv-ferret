@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { marked } from 'marked';
 import { profileAPI, cvDocumentAPI, documentAPI } from '../../services/ipc.js';
 import { usePoolStore } from '../../stores/poolStore.js';
 
@@ -15,10 +14,14 @@ import { usePoolStore } from '../../stores/poolStore.js';
 //               The new document's profile association still comes from the
 //               context in which the dialog was opened (preselectedProfileId).
 //
+// To import an existing CV file (DOCX/PDF/Markdown) and extract it into the
+// Experience Pool, point users at the Import page instead — see the hint below.
+//
 // Props:
 //   preselectedProfileId         — profile to associate the new CV with (from CV Library)
 //   onCreated(id, title, profileId) — called with the new cv_document id
 //   onCancel()                   — called if user dismisses without creating
+//   onNavigate(view)              — used to link to the Import page
 
 function defaultTitle() {
   return `New CV — ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`;
@@ -35,7 +38,7 @@ function uniqueDefaultTitle(existingDocs) {
   return `${base} (${n})`;
 }
 
-export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCancel, inline = false }) {
+export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCancel, onNavigate, inline = false }) {
   const poolJobs = usePoolStore(s => s.jobs);
   const poolEmpty = poolJobs.length === 0;
 
@@ -44,8 +47,6 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
   const [profiles, setProfiles]       = useState([]);
   const [cvDocuments, setCvDocuments] = useState([]);
   const [selectedCvId, setSelectedCvId] = useState('');
-  const [markdownHtml, setMarkdownHtml] = useState('');
-  const [markdownFileName, setMarkdownFileName] = useState('');
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
   const titleRef = useRef(null);
@@ -72,8 +73,7 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
   const preselectedProfile = profiles.find(p => String(p.id) === String(preselectedProfileId));
 
   const canCreate = title.trim() &&
-    (mode !== 'existing' || selectedCvId) &&
-    (mode !== 'markdown' || markdownHtml);
+    (mode !== 'existing' || selectedCvId);
 
   // CVs grouped for the optgroup dropdown.
   const profilesWithDocs = profiles.filter(p => cvDocuments.some(d => d.profile_id === p.id));
@@ -101,9 +101,6 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
       } else if (mode === 'existing') {
         const sourceDoc = await cvDocumentAPI.get(parseInt(selectedCvId));
         contentHtml = sourceDoc.content_html || '';
-
-      } else if (mode === 'markdown') {
-        contentHtml = markdownHtml;
       }
 
       const { id } = await cvDocumentAPI.create({
@@ -118,14 +115,6 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
     } finally {
       setLoading(false);
     }
-  }
-
-  async function handleMarkdownFile(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setMarkdownFileName(file.name);
-    const text = await file.text();
-    setMarkdownHtml(marked.parse(text));
   }
 
   function handleKeyDown(e) {
@@ -182,37 +171,7 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
             disabled={cvDocuments.length === 0}
             disabledHint="No saved drafts yet — create one using another option first, then come back here."
           />
-          <ModeCard
-            id="markdown"
-            selected={mode === 'markdown'}
-            onSelect={() => setMode('markdown')}
-            title="Import from Markdown"
-            description="Opens a .md file as a new CV document. Useful for agent-generated drafts. Content won't be pool-linked."
-          />
         </div>
-
-        {/* Markdown file picker */}
-        {mode === 'markdown' && (
-          <>
-            <label className="asm-dialog-label">
-              Markdown file
-              <input
-                type="file"
-                accept=".md,.txt"
-                className="asm-dialog-file-input"
-                onChange={handleMarkdownFile}
-              />
-              {markdownFileName && (
-                <span className="asm-dialog-hint">✓ {markdownFileName}</span>
-              )}
-            </label>
-            <p className="asm-dialog-hint">
-              Content imports as plain text. Bullets won't be linked to your Experience
-              Pool and won't be offered as building blocks — to add tasks to the pool,
-              use the Experience Pool page after importing.
-            </p>
-          </>
-        )}
 
         {/* CV picker: shown in existing mode, grouped by profile */}
         {mode === 'existing' && cvDocuments.length > 0 && (
@@ -243,6 +202,20 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
               )}
             </select>
           </label>
+        )}
+
+        {onNavigate && (
+          <p className="asm-dialog-hint">
+            Importing an existing CV file? Use the{' '}
+            <button
+              type="button"
+              className="asm-dialog-link"
+              onClick={() => onNavigate('import')}
+            >
+              Import page
+            </button>{' '}
+            to extract your jobs, education, and skills into the Experience Pool.
+          </p>
         )}
 
         {error && <p className="asm-dialog-error">{error}</p>}

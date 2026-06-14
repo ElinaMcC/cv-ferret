@@ -21,6 +21,9 @@ Every backend route that calls the Anthropic API must check **both** `aiEnabled`
 
 The one deliberate exception is the Import page's AI extraction route, where PII stripping is also intentionally omitted (documented separately).
 
+## Import
+`src/renderer/components/ImportPage.jsx` is the canonical home for bringing an existing CV into the app — AI extraction (`src/main/routes/import.js`) and the manual JSON path both live here. Other pages (Experience Pool, Education & Skills, Dashboard, StartNewCVDialog) should link to the Import page rather than hosting their own import UI.
+
 ## App knowledge (AI chat + Help page)
 `src/shared/appKnowledge.json` is the single source of truth for "how CV Ferret works" content — covering the Experience Pool, task versions, profiles, cover letters, the Pool Drawer, app navigation, and the onboarding flow. It is consumed by both:
 - `src/main/routes/aiChat.js` — included in the AI chat system prompt
