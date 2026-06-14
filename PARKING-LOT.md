@@ -150,7 +150,7 @@ Currently cv_documents are always snapshots: once a task is inserted into Assemb
 
 **Simpler variant worth evaluating first:** rather than live sync, fluid state means "notify the user when a pool item used in this CV has changed, with a one-click update offer per changed item." No automatic rewrite, no merge conflict. Same conceptual model, much lower implementation risk.
 
-**When to consider:** after the bulk-edit feature is stable. Requires a significant rethink of the Assembly/pool relationship and the cv_document schema.
+**When to consider:** the CV Library bulk-edit feature (select/move/delete) is now complete and stable. Requires a significant rethink of the Assembly/pool relationship and the cv_document schema.
 
 ---
 
@@ -163,3 +163,9 @@ Consider whether we need to allow a "Copy to other application" option for cover
 ## Responsiveness improvements
 
 Some of the screens (notably the CV library) don't resize well: item names are covered, the profiles list takes up too much space. There is probably a better way to break up the layout when a user resizes to smaller or partial screen.
+
+---
+
+## Bulk edit for experience pool task descriptions
+
+Over time, users might end up with quite many versions of each task description, with minor differences. It would be useful to offer cleanup features that let users delete multiple building blocks at once. There are some questions that need to be answered first. Users will need clarity about what happens if a given building block is currently in use in a CV draft. Should bulk delete only be possible within a particular job, or across all building blocks for all jobs in the pool?
