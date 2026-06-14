@@ -184,6 +184,11 @@ When Assembly is opened from the Application Tracker, a "← [Job Title] at [Emp
 - Saved letters are included in the DOCX/PDF export alongside the CV
 - **AI generation** (requires AI features) — choose Formal letter or Short note style; Claude drafts using the job ad, the linked CV's task descriptions, and your past cover letters as style samples
 
+### Help
+- In-app guide to the core concepts: Experience Pool, task versions, profiles, cover letters, the Pool Drawer, and how the app's sections fit together
+- Available to everyone, including users without AI enabled
+- The AI chat assistant in Assembly is given the same content, so it can answer the same "how does this work" questions conversationally
+
 ### Settings
 - **AI Features** — toggle all AI functionality on or off; when off, no data is ever sent to external services
 - **Anthropic API key** — paste and save through the UI; stored locally, never in the project folder
@@ -202,6 +207,9 @@ When Assembly is opened from the Application Tracker, a "← [Job Title] at [Emp
 
 ```
 src/
+├── shared/
+│   └── appKnowledge.json           — "How CV Ferret works" content, shared by the AI chat
+│                                       system prompt and the Help page
 ├── main/
 │   ├── server.js                  — Express server entry point; mounts all route files
 │   ├── db.js                      — Data layer: in-memory store + JSON persistence
@@ -246,6 +254,7 @@ src/
     │   ├── ApplicationTracker.jsx / .css — Application tracking, cover letters, export
     │   ├── Settings.jsx / .css          — All settings
     │   ├── ImportModal.jsx / .css        — JSON import modal
+    │   ├── HelpPage.jsx / .css           — In-app guide (renders src/shared/appKnowledge.json)
     │   └── InfoTip.jsx / .css            — Reusable inline help tooltip
     ├── contexts/
     │   ├── ToastContext.jsx        — Shared toast notification system

@@ -70,9 +70,11 @@ Unified Import page replacing all scattered import modals. Primary onboarding en
 
 ---
 
-### Phase 4 — AI knowledge base
+### Phase 4 — AI knowledge base ✅ Complete (merged to main, separate from Import page)
 
 **4.1** Add CV Ferret app knowledge to the Assembly `aiChat.js` system prompt (applies to all AI chat). Key knowledge: what the pool is, versions, profiles, cover letters location, how pool drawer works, common first-use questions.
+
+Implemented on `feature/ai-chat-knowledge-base` (merged to main, commit `dbe01ca`) — turned out to have no dependency on the Import page, so it was done as its own branch/PR. Went further than originally scoped: the content was factored into a shared `src/shared/appKnowledge.json`, consumed by both the `aiChat.js` system prompt and a new in-app **Help** page for users without AI enabled. See `CLAUDE.md` "App knowledge" section for the maintenance convention.
 
 ---
 
