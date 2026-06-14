@@ -174,7 +174,7 @@ Some of the screens don't resize well at smaller widths. The CV Library was the 
 
 ---
 
-## Full technical review of the app (multi-persona)
+## Full technical review of the app (multi-persona) ✅ Complete
 
 A comprehensive review of the whole app, conducted from four different perspectives, each looking for different things:
 
@@ -183,7 +183,12 @@ A comprehensive review of the whole app, conducted from four different perspecti
 - **Code quality expert** — consistency of patterns across components, dead code, duplication, opportunities to simplify now that several features have grown organically (e.g. CSS organisation, shared component extraction).
 - **Test engineer** — coverage gaps, untested edge cases, whether the current 53-test suite reflects the app's actual surface area, opportunities for integration/E2E coverage of key flows (Import, Assembly, CV Library).
 
-**When to consider:** after the current run of feature work settles down — this is a "step back and take stock" exercise rather than a specific bug fix, best done when there isn't an active feature mid-flight.
+All four passes are complete, with prioritized plans at `UX-OPTIMIZATION.md`,
+`CODE-QUALITY-OPTIMIZATION.md`, and `TEST-OPTIMIZATION.md` (product architect
+findings were small enough to action directly — `appKnowledge.json` nav sync
+fixed, Dashboard onboarding overlap folded into `UX-OPTIMIZATION.md` item 9).
+A merged, phased implementation plan combining all three documents was drawn
+up to minimize repeated passes over the same files.
 
 ---
 

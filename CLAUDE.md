@@ -16,6 +16,46 @@ These are intentional — do not suggest replacing them unprompted:
 ## Icons
 Use **Heroicons** (`@heroicons/react`) exclusively. Do not introduce other icon libraries.
 
+## Shared UI patterns
+A code quality review found the same UI patterns reimplemented separately
+across components (see `CODE-QUALITY-OPTIMIZATION.md` for the full
+writeup and migration plan). Going forward:
+
+- **Modal/dialog overlays** — use the shared `.modal-overlay` /
+  `.modal-dialog` classes in `src/renderer/styles/shared.css`. Do not add a
+  new per-component overlay class (e.g. `.foo-modal-overlay`) with its own
+  opacity/z-index — every existing one ended up subtly different and it's a
+  stacking-order risk.
+- **Icon-only buttons** — use the shared `.icon-btn` class in `shared.css`.
+  Do not redefine `.icon-btn` (or a renamed variant like `.foo-icon-btn`)
+  in a component stylesheet.
+- **Destructive confirmations** — use `<ConfirmDialog>`
+  (`src/renderer/components/ConfirmDialog.jsx`). Do not use
+  `window.confirm()` — it ignores dark mode and isn't accessible per the
+  rules below.
+- **All dialogs** (`role="dialog"`) must use `useFocusTrap`
+  (`src/renderer/hooks/useFocusTrap.js`) and have `aria-labelledby` pointing
+  at their title, per the Accessibility section above — this applies even
+  to small/simple dialogs like confirmation prompts.
+- **Component stylesheets should `@import '../styles/shared.css'`** unless
+  there's a specific reason not to — most of the duplication above happened
+  because a stylesheet didn't import it and a developer didn't know the
+  shared version existed.
+- **Date formatting** — use the shared formatters in
+  `src/renderer/utils/dates.js` rather than defining a local `formatDate`.
+
+(Note: `ConfirmDialog.jsx`, `shared.css`'s overlay/icon-btn classes, and
+`utils/dates.js` are being introduced as part of
+`CODE-QUALITY-OPTIMIZATION.md` — if you're working on this codebase before
+that lands, check whether these exist yet.)
+
+## Debugging
+Do not leave unconditional `console.log` of request/response bodies or
+other application data in committed code — this app handles personal data
+(names, addresses, CV content), and logging it to the browser console by
+default is a privacy leak. Gate any request/response logging behind
+`import.meta.env.DEV` if it's needed during development.
+
 ## AI route guard
 Every backend route that calls the Anthropic API must check **both** `aiEnabled` and `anthropicApiKey` before proceeding. Use the `requireAI(settings, res)` helper pattern already established in `routes/ai.js` and `routes/aiChat.js`. Checking the API key alone is not sufficient — a disabled toggle must be honoured server-side, not just in the UI.
 
