@@ -166,7 +166,24 @@ Consider whether we need to allow a "Copy to other application" option for cover
 
 ## Responsiveness improvements
 
-Some of the screens (notably the CV library) don't resize well: item names are covered, the profiles list takes up too much space. There is probably a better way to break up the layout when a user resizes to smaller or partial screen.
+Some of the screens don't resize well at smaller widths. The CV Library was the worst offender — the fixed-width profile sidebar squeezed CV titles down to a sliver, making file names illegible without hovering.
+
+**CV Library — done.** At `≤900px`, the profile list becomes a horizontally scrollable strip of chips above the detail panel (reclaiming its fixed 220px column), and CV doc rows wrap into two lines: title gets the full row width on line one, with date/actions wrapping to a right-aligned second line. Verified at 1400px, 700px, and 380px viewports.
+
+**Still to check:** other screens (Assembly, Experience Pool, Education & Skills, Application Tracker, Cover Letters) haven't been reviewed for the same issue — fold into the full technical review below if not addressed sooner.
+
+---
+
+## Full technical review of the app (multi-persona)
+
+A comprehensive review of the whole app, conducted from four different perspectives, each looking for different things:
+
+- **UX designer with technical frontend skills** — usability, layout, responsiveness, accessibility, visual consistency across pages, screen real estate usage (the CV Library responsiveness fix above was a first instance of this kind of issue — likely more exist elsewhere).
+- **Product architect** — overall feature coherence, whether the app's structure still matches how it's actually used now that Import, AI chat, bulk-edit, etc. have all landed; gaps or redundant paths between features.
+- **Code quality expert** — consistency of patterns across components, dead code, duplication, opportunities to simplify now that several features have grown organically (e.g. CSS organisation, shared component extraction).
+- **Test engineer** — coverage gaps, untested edge cases, whether the current 53-test suite reflects the app's actual surface area, opportunities for integration/E2E coverage of key flows (Import, Assembly, CV Library).
+
+**When to consider:** after the current run of feature work settles down — this is a "step back and take stock" exercise rather than a specific bug fix, best done when there isn't an active feature mid-flight.
 
 ---
 

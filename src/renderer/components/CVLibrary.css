@@ -489,3 +489,71 @@ html.dark .cvlib-icon-btn-danger:hover {
   gap: 8px;
   margin-top: 4px;
 }
+
+/* ── Responsive layout ───────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .cvlib-body {
+    flex-direction: column;
+  }
+
+  /* Profile list becomes a horizontally scrollable strip above the detail panel,
+     so it no longer reserves a fixed-width column on narrow screens. */
+  .cvlib-sidebar {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .cvlib-sidebar-header {
+    flex-shrink: 0;
+  }
+
+  .cvlib-profile-list {
+    flex-direction: row;
+    flex: 1;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .cvlib-profile-btn {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .cvlib-profile-name {
+    max-width: 140px;
+  }
+
+  .cvlib-profile-btn-unorganised {
+    border-top: none;
+    border-left: 1px solid var(--border);
+    margin-top: 0;
+    margin-left: 4px;
+    padding-left: 14px;
+  }
+
+  .cvlib-profile-detail-header {
+    flex-wrap: wrap;
+  }
+
+  /* CV rows stack: title gets the full row width on its own line, with
+     actions wrapping to a second line below — so the title is never
+     squeezed down to a sliver and relies on the hover tooltip to be read. */
+  .cvlib-doc-row {
+    flex-wrap: wrap;
+  }
+
+  .cvlib-doc-info {
+    flex-basis: 100%;
+  }
+
+  .cvlib-doc-actions {
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
