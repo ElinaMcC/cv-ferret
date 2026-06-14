@@ -21,6 +21,13 @@ Every backend route that calls the Anthropic API must check **both** `aiEnabled`
 
 The one deliberate exception is the Import page's AI extraction route, where PII stripping is also intentionally omitted (documented separately).
 
+## App knowledge (AI chat + Help page)
+`src/shared/appKnowledge.json` is the single source of truth for "how CV Ferret works" content — covering the Experience Pool, task versions, profiles, cover letters, the Pool Drawer, app navigation, and the onboarding flow. It is consumed by both:
+- `src/main/routes/aiChat.js` — included in the AI chat system prompt
+- `src/renderer/components/HelpPage.jsx` — rendered as the in-app Help page for users without AI enabled
+
+Any change to these concepts (e.g. renaming the Pool Drawer, adding a sidebar section, changing how versions or profiles work) must update this file so the AI chat and the Help page stay accurate and in sync. Do not duplicate this content elsewhere.
+
 ## PII awareness
 When touching AI-related code (`src/main/routes/ai.js`, `aiChat.js`, `piiUtils.js`), always consider whether personal data could be exposed. The established pattern is `piiUtils.js` stripping before every AI call — maintain this.
 
