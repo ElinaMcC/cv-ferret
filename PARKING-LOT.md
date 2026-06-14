@@ -188,7 +188,26 @@ All four passes are complete, with prioritized plans at `UX-OPTIMIZATION.md`,
 findings were small enough to action directly — `appKnowledge.json` nav sync
 fixed, Dashboard onboarding overlap folded into `UX-OPTIMIZATION.md` item 9).
 A merged, phased implementation plan combining all three documents was drawn
-up to minimize repeated passes over the same files.
+up to minimize repeated passes over the same files. Implementation is
+underway on branch `feature/optimization-plan-implementation`:
+
+- ✅ **Phase 0 — Shared primitives** (`0f4661d`): `shared.css` modal-overlay/
+  modal-dialog/icon-btn, new `ConfirmDialog.jsx`, `utils/dates.js`, `ipc.js`
+  PII logging fix, CLAUDE.md doc updates.
+- ✅ **Phase 1 — Backend test suite** (`0f4661d`): `db.test.js`,
+  `jobsAndTasks.test.js`, `aiRouteGuard.test.js` — full suite (100 tests)
+  passing.
+- ✅ **Phase 2 — Experience Pool** (`10c8ce8`): migrated to shared
+  `ConfirmDialog`/`.icon-btn`, added `@media (max-width: 900px)` responsive
+  fix for task rows + toolbar, aria-label sweep on remaining icon buttons.
+- ⏳ **Phase 3 — Application Tracker**: not started.
+- ⏳ **Phases 4–10**: not started (Education & Reference, Assembly &
+  dialogs, CV Library & Settings, Personal Details, Dashboard onboarding
+  design discussion, recently-shipped feature tests, dark mode + Playwright
+  last).
+
+Working tree is clean as of the end of this session — resume with Phase 3
+next.
 
 ---
 
