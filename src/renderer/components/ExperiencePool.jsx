@@ -3,6 +3,7 @@ import { taskAPI, generationAPI } from '../services/ipc';
 import { useToast } from '../contexts/ToastContext';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 import ExperienceForm from './ExperienceForm';
+import ConfirmDialog from './ConfirmDialog';
 import { Icon } from '../utils/icons';
 import './ExperiencePool.css';
 
@@ -398,6 +399,7 @@ export default function ExperiencePool({ onNavigate }) {
                   setEditingJob(job);
                 }}
                 title="Edit job details"
+                aria-label="Edit job details"
               >
                 <Icon.Edit className="icon" />
               </button>
@@ -409,6 +411,7 @@ export default function ExperiencePool({ onNavigate }) {
                   setSelectedJob(job);
                 }}
                 title="Add task to this job"
+                aria-label="Add task to this job"
               >
                 <Icon.Add className="icon" />
               </button>
@@ -468,6 +471,7 @@ export default function ExperiencePool({ onNavigate }) {
                             setEditingVersion(defaultVersion);
                           }}
                           title="Edit task"
+                          aria-label="Edit task"
                         >
                           <Icon.Edit className="icon" />
                         </button>
@@ -541,6 +545,7 @@ export default function ExperiencePool({ onNavigate }) {
                                   className="icon-btn delete-btn"
                                   onClick={() => removePendingVersion(task.id, idx)}
                                   title="Remove this version"
+                                  aria-label="Remove this version"
                                 >
                                   <Icon.Delete className="icon" />
                                 </button>
@@ -609,6 +614,7 @@ export default function ExperiencePool({ onNavigate }) {
                                   setEditingVersion(version);
                                 }}
                                 title="Edit version"
+                                aria-label="Edit version"
                               >
                                 <Icon.Edit className="icon" />
                               </button>
@@ -617,6 +623,7 @@ export default function ExperiencePool({ onNavigate }) {
                                   className="icon-btn"
                                   onClick={() => handleSetDefault(version.id)}
                                   title="Set as default"
+                                  aria-label="Set as default version"
                                 >
                                   <Icon.SetDefault className="icon" />
                                 </button>
@@ -625,6 +632,7 @@ export default function ExperiencePool({ onNavigate }) {
                                 className="icon-btn delete-btn"
                                 onClick={() => handleDeleteVersion(version.id, version.description)}
                                 title="Delete version"
+                                aria-label="Delete version"
                               >
                                 <Icon.Delete className="icon" />
                               </button>
@@ -661,25 +669,11 @@ export default function ExperiencePool({ onNavigate }) {
         title={`Generate versions for ${generateConfirm.count} task${generateConfirm.count !== 1 ? 's' : ''}?`}
         body={`This will call the Anthropic API once per task. Depending on your usage it may incur a small cost. Existing role-specific versions won't be affected.`}
         confirmLabel="Generate"
+        danger={false}
         onConfirm={confirmGenerateAll}
         onCancel={() => setGenerateConfirm(null)}
       />
     )}
     </>
-  );
-}
-
-function ConfirmDialog({ title, body, confirmLabel, onConfirm, onCancel }) {
-  return (
-    <div className="ep-confirm-overlay" onKeyDown={e => e.key === 'Escape' && onCancel()}>
-      <div className="ep-confirm-box" role="alertdialog" aria-modal="true" aria-labelledby="ep-confirm-title">
-        <h3 id="ep-confirm-title">{title}</h3>
-        <p>{body}</p>
-        <div className="ep-confirm-actions">
-          <button className="btn btn-secondary btn-sm" onClick={onCancel}>Cancel</button>
-          <button className="btn btn-danger btn-sm" onClick={onConfirm}>{confirmLabel}</button>
-        </div>
-      </div>
-    </div>
   );
 }

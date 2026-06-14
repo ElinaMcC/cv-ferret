@@ -27,45 +27,6 @@
   margin: -12px 0 16px;
 }
 
-.ep-confirm-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 500;
-}
-
-.ep-confirm-box {
-  background: var(--bg-card);
-  border-radius: 10px;
-  padding: 24px;
-  max-width: 420px;
-  width: 90%;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-}
-
-.ep-confirm-box h3 {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 10px;
-  color: var(--text-primary);
-}
-
-.ep-confirm-box p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0 0 20px;
-}
-
-.ep-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
 .search-bar {
   display: flex;
   gap: 10px;
@@ -267,25 +228,9 @@
   align-items: flex-start;
 }
 
-/* Icon button styling */
-.icon-btn {
-  background: none;
-  border: none;
-  padding: 4px 6px;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: color 0.2s, transform 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 3px;
-}
-
-.icon-btn:hover {
-  color: var(--text-primary);
-  transform: scale(1.1);
-}
-
+/* Icon buttons here are larger than the shared default — this is the
+   densest page in the app and the bigger targets help with the long
+   lists of per-task actions. */
 .icon-btn .icon {
   width: 20px;
   height: 20px;
@@ -514,4 +459,29 @@
 .generation-review-actions {
   display: flex;
   gap: 8px;
+}
+
+/* Narrow viewports: stack the toolbar, and move task action icons onto
+   their own row below the drag handle + description so the description
+   isn't squeezed down to one character per line. */
+@media (max-width: 900px) {
+  .experience-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
+  .task-row {
+    flex-wrap: wrap;
+  }
+
+  .task-inline-actions {
+    flex: 1 0 100%;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
 }
