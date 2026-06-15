@@ -1,8 +1,10 @@
+@import '../styles/shared.css';
+
 /* ── Page layout ─────────────────────────────────────────────────────────────── */
 
 .at-page {
   display: flex;
-  height: 100%;
+  height: calc(100% + 40px);
   margin: -20px;
   overflow: hidden;
 }
@@ -618,31 +620,6 @@
 
 /* ── Export modal ─────────────────────────────────────────────────────────────── */
 
-.at-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-
-.at-modal {
-  background: var(--bg-card);
-  border-radius: 8px;
-  padding: 28px;
-  width: 500px;
-  max-width: calc(100vw - 40px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-}
-
-.at-modal h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  color: var(--text-heading);
-}
-
 .at-modal-desc {
   font-size: 13px;
   color: var(--text-muted);
@@ -698,12 +675,6 @@
   flex-shrink: 0;
 }
 
-.at-modal-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-}
-
 .at-modal-result {
   margin-top: 16px;
   padding: 12px 14px;
@@ -735,4 +706,35 @@ html.dark .at-modal-result {
 
 .at-modal-result li {
   margin: 2px 0;
+}
+
+/* ── Responsive layout ───────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .at-page {
+    flex-direction: column;
+  }
+
+  .at-list-panel {
+    flex: 0 0 auto;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .at-detail-panel {
+    flex: 1 1 auto;
+  }
+
+  .at-detail-title-row {
+    flex-wrap: wrap;
+  }
+
+  .at-field-employer {
+    flex: 1 1 100%;
+  }
+
+  .at-detail-header-actions {
+    flex-wrap: wrap;
+  }
 }

@@ -3,8 +3,10 @@ import { applicationAPI, cvDocumentAPI, referenceAPI, coverLetterAPI, settingsAP
 import { useAppSettings } from '../contexts/AppSettingsContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import InfoTip from './InfoTip';
+import ConfirmDialog from './ConfirmDialog';
 import { useToast } from '../contexts/ToastContext';
 import { Icon } from '../utils/icons';
+import { formatDate } from '../utils/dates';
 import './ApplicationTracker.css';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -33,12 +35,6 @@ const STATUSES_WITH_DATE = ['applied', 'interviewing', 'offer', 'closed'];
 
 function todayStr() {
   return new Date().toISOString().split('T')[0];
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function emptyForm() {
@@ -115,6 +111,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
   const [clMeta, setClMeta] = useState({ salutation: '', closing: '', locale: 'en-GB' });
   const [clGenerating, setClGenerating] = useState(false);
   const [exportPathDefault, setExportPathDefault] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportFolder, setExportFolder] = useState('');
   const [copyRefs, setCopyRefs] = useState(false);
@@ -313,8 +310,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
     }
   }
 
-  async function handleDelete() {
-    if (!window.confirm('Delete this application?')) return;
+  async function confirmDeleteApplication() {
     try {
       await applicationAPI.delete(selectedId);
       setApplications(prev => prev.filter(a => a.id !== selectedId));
@@ -323,6 +319,8 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
       showToast('Deleted.');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setConfirmDelete(false);
     }
   }
 
@@ -497,19 +495,19 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
       {/* ── Export modal ── */}
       {showExportModal && (
         <div
-          className="at-modal-overlay"
+          className="modal-overlay"
           onClick={() => setShowExportModal(false)}
           onKeyDown={e => { if (e.key === 'Escape') setShowExportModal(false); }}
         >
           <div
-            className="at-modal"
+            className="modal-dialog modal-dialog-wide"
             role="dialog"
             aria-modal="true"
             aria-labelledby="export-modal-title"
             ref={exportModalRef}
             onClick={e => e.stopPropagation()}
           >
-            <h3 id="export-modal-title">Export Files</h3>
+            <h3 id="export-modal-title" className="modal-dialog-title">Export Files</h3>
             <p className="at-modal-desc">
               Saves CV and cover letter as DOCX and PDF into a new sub-folder named after this
               application. The CV uses the linked CV document; the cover letter uses the saved text.
@@ -550,7 +548,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
                 </button>
               </div>
             ) : null}
-            <div className="at-modal-actions">
+            <div className="modal-dialog-actions">
               {exportResult ? (
                 <>
                   <button className="btn btn-primary" onClick={() => setShowExportModal(false)}>
@@ -632,7 +630,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
                 )}
 
                 {selectedId !== 'new' && (
-                  <button className="btn btn-secondary btn-sm at-delete-btn" onClick={handleDelete}>Delete</button>
+                  <button className="btn btn-secondary btn-sm at-delete-btn" onClick={() => setConfirmDelete(true)}>Delete</button>
                 )}
                 {selectedId !== 'new' && (
                   <button className="btn btn-secondary btn-sm" onClick={openExportModal} title="Export CV and cover letter as DOCX and PDF">
@@ -957,6 +955,16 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
           </div>
         )}
       </div>
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Delete this application?"
+          body="This will permanently delete the application, including its notes and cover letter. This cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={confirmDeleteApplication}
+          onCancel={() => setConfirmDelete(false)}
+        />
+      )}
     </div>
   );
 }
