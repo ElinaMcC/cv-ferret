@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { applicationAPI } from '../../services/ipc.js';
 import { useToast } from '../../contexts/ToastContext.jsx';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 
 // Modal for linking the current cv_document to an application.
 //
@@ -26,6 +27,10 @@ export default function SaveToApplicationModal({ documentId, documentTitle, onCl
   const [linked, setLinked]         = useState(null); // { employer, job_title } after success
 
   const searchRef = useRef(null);
+  const mainDialogRef = useRef(null);
+  const linkedDialogRef = useRef(null);
+  useFocusTrap(!linked, mainDialogRef);
+  useFocusTrap(!!linked, linkedDialogRef);
 
   useEffect(() => {
     applicationAPI.list()
@@ -86,16 +91,17 @@ export default function SaveToApplicationModal({ documentId, documentTitle, onCl
 
   if (linked) {
     return (
-      <div className="asm-dialog-overlay" onKeyDown={handleKeyDown}>
-        <div className="asm-dialog" role="dialog" aria-modal="true">
-          <h2 className="asm-dialog-title">Linked</h2>
-          <p className="asm-dialog-body">
+      <div className="modal-overlay" onKeyDown={handleKeyDown}>
+        <div className="modal-dialog" role="dialog" aria-modal="true"
+             aria-labelledby="link-app-linked-title" ref={linkedDialogRef}>
+          <h2 className="modal-dialog-title" id="link-app-linked-title">Linked</h2>
+          <p className="modal-dialog-body">
             <strong>{documentTitle || 'This CV'}</strong> is now linked to{' '}
             <strong>{linked.job_title || '(untitled)'}</strong>
             {linked.employer ? ` at ${linked.employer}` : ''}.
             You can view and manage it from the Application Tracker.
           </p>
-          <div className="asm-dialog-actions">
+          <div className="modal-dialog-actions">
             <button className="btn btn-primary btn-sm" onClick={onClose} autoFocus>
               Done
             </button>
@@ -108,12 +114,12 @@ export default function SaveToApplicationModal({ documentId, documentTitle, onCl
   // ── Main state ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="asm-dialog-overlay" onKeyDown={handleKeyDown}>
-      <div className="asm-dialog asm-dialog-wide" role="dialog" aria-modal="true"
-           aria-label="Link to application">
+    <div className="modal-overlay" onKeyDown={handleKeyDown}>
+      <div className="modal-dialog modal-dialog-wide" role="dialog" aria-modal="true"
+           aria-labelledby="link-app-title" ref={mainDialogRef}>
 
-        <h2 className="asm-dialog-title">Link to Application</h2>
-        <p className="asm-dialog-body">
+        <h2 className="modal-dialog-title" id="link-app-title">Link to Application</h2>
+        <p className="modal-dialog-body">
           Associate <strong>{documentTitle || 'this CV'}</strong> with a job application.
         </p>
 
@@ -205,7 +211,7 @@ export default function SaveToApplicationModal({ documentId, documentTitle, onCl
           </>
         )}
 
-        <div className="asm-dialog-actions">
+        <div className="modal-dialog-actions">
           <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={saving}>
             Cancel
           </button>

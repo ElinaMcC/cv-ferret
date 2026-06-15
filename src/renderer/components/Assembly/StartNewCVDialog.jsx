@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { profileAPI, cvDocumentAPI, documentAPI } from '../../services/ipc.js';
 import { usePoolStore } from '../../stores/poolStore.js';
+import { useFocusTrap } from '../../hooks/useFocusTrap.js';
 
 // Three ways to start a new CV:
 //
@@ -50,6 +51,8 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState('');
   const titleRef = useRef(null);
+  const dialogRef = useRef(null);
+  useFocusTrap(!inline, dialogRef);
 
   useEffect(() => {
     titleRef.current?.focus();
@@ -126,9 +129,9 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
 
   return (
     <Wrapper onKeyDown={handleKeyDown}>
-      <div className="asm-dialog" role="dialog" aria-modal="true" aria-label="New CV">
+      <div className="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="new-cv-title" ref={dialogRef}>
 
-        <h2 className="asm-dialog-title">Start a new CV</h2>
+        <h2 className="modal-dialog-title" id="new-cv-title">Start a new CV</h2>
 
         <label className="asm-dialog-label">
           Title
@@ -220,7 +223,7 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
 
         {error && <p className="asm-dialog-error">{error}</p>}
 
-        <div className="asm-dialog-actions">
+        <div className="modal-dialog-actions">
           <button className="btn btn-ghost btn-sm" onClick={onCancel} disabled={loading}>
             Cancel
           </button>
@@ -239,7 +242,7 @@ export default function StartNewCVDialog({ preselectedProfileId, onCreated, onCa
 }
 
 function OverlayWrapper({ children, onKeyDown }) {
-  return <div className="asm-dialog-overlay" onKeyDown={onKeyDown}>{children}</div>;
+  return <div className="modal-overlay" onKeyDown={onKeyDown}>{children}</div>;
 }
 
 function InlineWrapper({ children, onKeyDown }) {

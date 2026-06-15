@@ -200,13 +200,35 @@ underway on branch `feature/optimization-plan-implementation`:
 - ✅ **Phase 2 — Experience Pool** (`10c8ce8`): migrated to shared
   `ConfirmDialog`/`.icon-btn`, added `@media (max-width: 900px)` responsive
   fix for task rows + toolbar, aria-label sweep on remaining icon buttons.
-- ⏳ **Phase 3 — Application Tracker**: not started.
-- ⏳ **Phases 4–10**: not started (Education & Reference, Assembly &
-  dialogs, CV Library & Settings, Personal Details, Dashboard onboarding
-  design discussion, recently-shipped feature tests, dark mode + Playwright
-  last).
+- ✅ **Phase 3 — Application Tracker** (`0293daf`): migrated export modal to
+  shared `.modal-overlay`/`.modal-dialog modal-dialog-wide`, replaced
+  `window.confirm` delete with `<ConfirmDialog>`, removed local `formatDate`
+  in favour of `utils/dates.js`, added `@media (max-width:900px)`
+  single-column responsive layout, fixed the "stray grey bar" root cause
+  (`.at-page` height/margin).
+- ✅ **Phase 4 — Education & Reference pages** (`bf525d0`): removed
+  duplicated local `.icon-btn` blocks, migrated deletes to
+  `<ConfirmDialog>`, aria-label sweep on icon-only buttons, `@media
+  (max-width:600px)` stacking fix for entry rows, confirmed Reference
+  Letters filename truncation already correct.
+- ✅ **Phase 5 — Assembly & dialogs**: `Assembly.css` now imports
+  `shared.css`; removed duplicated `.asm-dialog-overlay`/`.asm-dialog`/
+  `.asm-dialog-title`/`.asm-dialog-body`/`.asm-dialog-warning`/
+  `.asm-dialog-actions`/`.asm-dialog-wide`/`.pool-icon-btn` blocks.
+  Migrated `SaveAsCvModal`, `PoolBuildingBlocksDialog`,
+  `DeleteCvConfirmDialog`, `NavGuardDialog` (in `AssemblyPage.jsx`),
+  `StartNewCVDialog`, and `SaveToApplicationModal` to shared
+  `.modal-overlay`/`.modal-dialog`/`.modal-dialog-wide` classes with
+  `useFocusTrap` + `aria-labelledby`. Replaced `.pool-icon-btn` with
+  shared `.icon-btn` in `PoolDrawer.jsx` and `AIChatPanel.jsx`. Verified
+  via Playwright at 1400/900/380px and dark mode — New CV dialog no
+  longer overflows at 380x420 (UX-OPTIMIZATION item 4 fix confirmed).
+  Full test suite still 100/100.
+- ⏳ **Phases 6–10**: not started (CV Library & Settings, Personal
+  Details, Dashboard onboarding design discussion, recently-shipped
+  feature tests, dark mode + Playwright last).
 
-Working tree is clean as of the end of this session — resume with Phase 3
+Working tree is clean as of the end of this session — resume with Phase 6
 next.
 
 ---

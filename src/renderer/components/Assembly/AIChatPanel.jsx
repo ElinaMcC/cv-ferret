@@ -506,7 +506,7 @@ export default function AIChatPanel({ editorRef, getDocumentStructure }) {
           AI Assistant
         </span>
         <button
-          className="pool-icon-btn"
+          className="icon-btn"
           onClick={() => setPanelOpen(false)}
           aria-label="Close AI assistant"
         >
