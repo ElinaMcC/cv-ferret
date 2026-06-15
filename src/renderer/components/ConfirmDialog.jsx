@@ -26,7 +26,7 @@ export default function ConfirmDialog({
         aria-labelledby={TITLE_ID}
       >
         <h3 id={TITLE_ID} className="modal-dialog-title">{title}</h3>
-        {body && <p className="modal-dialog-body">{body}</p>}
+        {body && <div className="modal-dialog-body">{body}</div>}
         <div className="modal-dialog-actions">
           <button className="btn btn-secondary btn-sm" onClick={onCancel}>{cancelLabel}</button>
           <button className={`btn btn-sm ${danger ? 'btn-danger' : 'btn-primary'}`} onClick={onConfirm}>

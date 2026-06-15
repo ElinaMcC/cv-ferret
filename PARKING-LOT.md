@@ -211,7 +211,7 @@ underway on branch `feature/optimization-plan-implementation`:
   `<ConfirmDialog>`, aria-label sweep on icon-only buttons, `@media
   (max-width:600px)` stacking fix for entry rows, confirmed Reference
   Letters filename truncation already correct.
-- ✅ **Phase 5 — Assembly & dialogs**: `Assembly.css` now imports
+- ✅ **Phase 5 — Assembly & dialogs** (`e4961a2`): `Assembly.css` now imports
   `shared.css`; removed duplicated `.asm-dialog-overlay`/`.asm-dialog`/
   `.asm-dialog-title`/`.asm-dialog-body`/`.asm-dialog-warning`/
   `.asm-dialog-actions`/`.asm-dialog-wide`/`.pool-icon-btn` blocks.
@@ -224,11 +224,31 @@ underway on branch `feature/optimization-plan-implementation`:
   via Playwright at 1400/900/380px and dark mode — New CV dialog no
   longer overflows at 380x420 (UX-OPTIMIZATION item 4 fix confirmed).
   Full test suite still 100/100.
-- ⏳ **Phases 6–10**: not started (CV Library & Settings, Personal
-  Details, Dashboard onboarding design discussion, recently-shipped
-  feature tests, dark mode + Playwright last).
+- ✅ **Phase 6 — CV Library & Settings**: `CVLibrary.css` now imports
+  `shared.css`; removed its duplicated local `.modal-overlay` (which had
+  a different opacity, 0.45 vs the shared 0.5) and renamed `.modal-box`/
+  `.modal-title`/`.modal-body-text`/`.modal-warning`/`.modal-actions` to
+  the shared `.modal-dialog`/`.modal-dialog-title`/`.modal-dialog-body`/
+  `.modal-dialog-warning`/`.modal-dialog-actions` (kept CVLibrary-specific
+  `.modal-form`/`.modal-label`/`.modal-input`/`.modal-optional` for the
+  Profile/Edit CV forms, which have no shared equivalent). Migrated
+  `DeleteConfirmModal` and `BulkDeleteConfirmModal` to `<ConfirmDialog>`
+  (extended `ConfirmDialog` to render `body` in a `<div>` instead of `<p>`
+  so it can take multi-paragraph JSX with a conditional
+  `.modal-dialog-warning` paragraph). Replaced both `window.confirm()`
+  calls in `Settings.jsx` (remove API key, restore backup) with
+  `<ConfirmDialog>`. `.cvlib-icon-btn` (bordered 30x30 row-action buttons,
+  already has aria-labels) deliberately left as-is — a genuinely different
+  visual style from the flat shared `.icon-btn`, not a redefinition of it.
+  CV Library's 900px responsive layout and aria-labels were already done
+  (reference implementation from the earlier responsiveness pass).
+  Verified at 1400/900/380px and dark mode via Playwright; full test suite
+  (100 tests) still passes.
+- ⏳ **Phases 7–10**: not started (Personal Details, Dashboard onboarding
+  design discussion, recently-shipped feature tests, dark mode +
+  Playwright last).
 
-Working tree is clean as of the end of this session — resume with Phase 6
+Working tree is clean as of the end of this session — resume with Phase 7
 next.
 
 ---
