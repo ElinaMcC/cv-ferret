@@ -224,7 +224,7 @@ underway on branch `feature/optimization-plan-implementation`:
   via Playwright at 1400/900/380px and dark mode — New CV dialog no
   longer overflows at 380x420 (UX-OPTIMIZATION item 4 fix confirmed).
   Full test suite still 100/100.
-- ✅ **Phase 6 — CV Library & Settings**: `CVLibrary.css` now imports
+- ✅ **Phase 6 — CV Library & Settings** (`9d3a7b3`): `CVLibrary.css` now imports
   `shared.css`; removed its duplicated local `.modal-overlay` (which had
   a different opacity, 0.45 vs the shared 0.5) and renamed `.modal-box`/
   `.modal-title`/`.modal-body-text`/`.modal-warning`/`.modal-actions` to
@@ -244,11 +244,17 @@ underway on branch `feature/optimization-plan-implementation`:
   (reference implementation from the earlier responsiveness pass).
   Verified at 1400/900/380px and dark mode via Playwright; full test suite
   (100 tests) still passes.
-- ⏳ **Phases 7–10**: not started (Personal Details, Dashboard onboarding
-  design discussion, recently-shipped feature tests, dark mode +
-  Playwright last).
+- ✅ **Phase 7 — Personal Details**: added `@media (max-width: 600px)`
+  rule to `PersonalDetails.css` switching `.personal-form-row` from
+  `flex-direction: row` to `column` (UX-OPTIMIZATION item 5) — fixes
+  "Place of Birth" being squeezed to ~50px/wrapping to three lines at
+  380px. Added `aria-label` to the `.link-remove` "×" button. Verified at
+  1400/900/380px and dark mode via Playwright; full test suite (100 tests)
+  still passes.
+- ⏳ **Phases 8–10**: not started (Dashboard onboarding design discussion,
+  recently-shipped feature tests, dark mode + Playwright last).
 
-Working tree is clean as of the end of this session — resume with Phase 7
+Working tree is clean as of the end of this session — resume with Phase 8
 next.
 
 ---

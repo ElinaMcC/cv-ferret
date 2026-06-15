@@ -116,7 +116,7 @@ export default function PersonalDetails() {
               {form.links.map(link => (
                 <div key={link} className="link-item">
                   <a href={link} target="_blank" rel="noreferrer">{link}</a>
-                  <button className="link-remove" onClick={() => removeLink(link)} title="Remove">×</button>
+                  <button className="link-remove" onClick={() => removeLink(link)} title="Remove" aria-label={`Remove link ${link}`}>×</button>
                 </div>
               ))}
             </div>
