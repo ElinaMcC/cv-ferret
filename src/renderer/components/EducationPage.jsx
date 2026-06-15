@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { educationAPI } from '../services/ipc';
 import { useToast } from '../contexts/ToastContext';
 import { Icon } from '../utils/icons';
+import ConfirmDialog from './ConfirmDialog';
 import './EducationPage.css';
 
 const CEFR_LEVELS = [
@@ -150,10 +151,10 @@ function EntrySection({ title, entries, onCreate, onUpdate, onDelete }) {
                 <div className="entry-meta">
                   {entry.end_date && <span className="entry-date">{entry.end_date}</span>}
                   <div className="entry-actions">
-                    <button className="icon-btn" onClick={() => setEditingId(entry.id)} title="Edit">
+                    <button className="icon-btn" onClick={() => setEditingId(entry.id)} title="Edit" aria-label={`Edit ${entry.title}`}>
                       <Icon.Edit className="icon" />
                     </button>
-                    <button className="icon-btn delete-btn" onClick={() => onDelete(entry.id)} title="Delete">
+                    <button className="icon-btn delete-btn" onClick={() => onDelete(entry.id, entry.title)} title="Delete" aria-label={`Delete ${entry.title}`}>
                       <Icon.Delete className="icon" />
                     </button>
                   </div>
@@ -199,7 +200,7 @@ function SkillsSection({ skills, onAdd, onRemove }) {
           {skills.map(skill => (
             <span key={skill} className="skill-chip">
               {skill}
-              <button className="skill-remove" onClick={() => onRemove(skill)} title="Remove">×</button>
+              <button className="skill-remove" onClick={() => onRemove(skill)} title="Remove" aria-label={`Remove ${skill}`}>×</button>
             </span>
           ))}
         </div>
@@ -268,7 +269,7 @@ function LanguagesSection({ languages, onAdd, onRemove }) {
               <div key={entry.language} className="language-entry">
                 <span className="lang-name">{entry.language}</span>
                 <span className="lang-level-badge">{level ? level.label : entry.level}</span>
-                <button className="icon-btn delete-btn" onClick={() => onRemove(entry.language)} title="Remove">
+                <button className="icon-btn delete-btn" onClick={() => onRemove(entry.language)} title="Remove" aria-label={`Remove ${entry.language}`}>
                   <Icon.Delete className="icon" />
                 </button>
               </div>
@@ -289,6 +290,7 @@ export default function EducationPage({ onNavigate }) {
   const [skills, setSkills] = useState([]);
   const [languages, setLanguages] = useState([]);
   const [error, setError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null); // { type: 'education'|'training', id, label }
   const showToast = useToast();
 
   useEffect(() => { load(); }, []);
@@ -326,9 +328,8 @@ export default function EducationPage({ onNavigate }) {
     } catch (err) { setError(err.message); }
   }
 
-  async function handleDeleteEducation(id) {
-    if (!window.confirm('Delete this entry?')) return;
-    try { await educationAPI.deleteEducation(id); load(); showToast('Deleted.'); } catch (err) { setError(err.message); }
+  function handleDeleteEducation(id, label) {
+    setConfirmDelete({ type: 'education', id, label });
   }
 
   async function handleCreateTraining(form) {
@@ -347,9 +348,18 @@ export default function EducationPage({ onNavigate }) {
     } catch (err) { setError(err.message); }
   }
 
-  async function handleDeleteTraining(id) {
-    if (!window.confirm('Delete this entry?')) return;
-    try { await educationAPI.deleteTraining(id); load(); showToast('Deleted.'); } catch (err) { setError(err.message); }
+  function handleDeleteTraining(id, label) {
+    setConfirmDelete({ type: 'training', id, label });
+  }
+
+  async function confirmDeleteEntry() {
+    try {
+      if (confirmDelete.type === 'education') await educationAPI.deleteEducation(confirmDelete.id);
+      else await educationAPI.deleteTraining(confirmDelete.id);
+      load();
+      showToast('Deleted.');
+    } catch (err) { setError(err.message); }
+    finally { setConfirmDelete(null); }
   }
 
   async function handleAddSkill(skill) {
@@ -411,6 +421,15 @@ export default function EducationPage({ onNavigate }) {
         onRemove={handleRemoveLanguage}
       />
 
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Delete this entry?"
+          body={`This will permanently delete "${confirmDelete.label}". This cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={confirmDeleteEntry}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
     </div>
   );
 }
