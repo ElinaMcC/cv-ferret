@@ -244,7 +244,7 @@ underway on branch `feature/optimization-plan-implementation`:
   (reference implementation from the earlier responsiveness pass).
   Verified at 1400/900/380px and dark mode via Playwright; full test suite
   (100 tests) still passes.
-- ✅ **Phase 7 — Personal Details**: added `@media (max-width: 600px)`
+- ✅ **Phase 7 — Personal Details** (`82ed55b`): added `@media (max-width: 600px)`
   rule to `PersonalDetails.css` switching `.personal-form-row` from
   `flex-direction: row` to `column` (UX-OPTIMIZATION item 5) — fixes
   "Place of Birth" being squeezed to ~50px/wrapping to three lines at
