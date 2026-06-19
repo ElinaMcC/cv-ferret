@@ -265,9 +265,20 @@ underway on branch `feature/optimization-plan-implementation`:
   reference nulling, `batchMoveCvDocuments` profile reassignment,
   `batchDeleteProfiles` with/without `deleteCvDocs`, `batchDeleteJobs` and
   `batchDeleteTasks` cascade deletion). Full suite: 142/142 passing.
-- ⏳ **Phase 10**: not started (dark mode audit + Playwright smoke suite).
+- ✅ **Phase 10 — Dark mode audit + Playwright smoke suite** (`313b912` on
+  `feature/phase-9-tests`): `@playwright/test` added as devDependency;
+  `playwright.config.js` targets dev server on `:5173` with
+  `reuseExistingServer`; `e2e/smoke.spec.js` (9 tests — Experience Pool at
+  1440/900/380px, Assembly Start New CV dialog accessibility + 380px usability,
+  CV Library responsive layout at 1440px/900px/380px). Dark mode CSS audit:
+  replaced hardcoded hex colours with CSS variables in 6 component files
+  (ExperiencePool, ExperienceForm, EducationPage, ReferencePage,
+  PersonalDetails, InfoTip) — tag/badge colours, success/error banners,
+  light-grey card backgrounds, InfoTip trigger + bubble. Unit suite: 142/142.
+  E2E suite: 9/9.
 
-Working tree is clean as of the end of this session.
+All 10 phases of the optimization plan are now complete. Working tree is
+clean as of the end of this session.
 
 ---
 
