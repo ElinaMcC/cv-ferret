@@ -118,7 +118,7 @@ export default function PoolDrawer({ editorRef }) {
           <span className="pool-drawer-title">Task Pool</span>
           <div className="pool-drawer-header-actions">
             <button
-              className="pool-icon-btn"
+              className="icon-btn"
               onClick={loadJobs}
               title="Refresh pool"
               aria-label="Refresh pool"
@@ -127,7 +127,7 @@ export default function PoolDrawer({ editorRef }) {
               <ArrowPathIcon className={`pool-icon${loadingJobs ? ' spinning' : ''}`} />
             </button>
             <button
-              className="pool-icon-btn"
+              className="icon-btn"
               onClick={toggleDrawer}
               title="Close"
               aria-label="Close pool drawer"

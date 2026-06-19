@@ -319,19 +319,34 @@
   white-space: nowrap;
 }
 
-/* Icon buttons (local — EducationPage uses softer hover than ExperiencePool) */
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  transition: all 0.15s;
-}
-
-.icon-btn:hover { background-color: var(--bg-tertiary); color: var(--text-primary); }
 .icon-btn.delete-btn:hover { background-color: var(--color-error-bg); color: #e74c3c; }
-.icon-btn .icon { width: 16px; height: 16px; }
+
+/* ── Narrow viewports ────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .entry-view {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .entry-meta {
+    justify-content: space-between;
+  }
+
+  .edu-form-row {
+    flex-direction: column;
+  }
+
+  .edu-form-group-narrow {
+    flex: 1;
+  }
+
+  .lang-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lang-level-field {
+    flex: 1;
+  }
+}

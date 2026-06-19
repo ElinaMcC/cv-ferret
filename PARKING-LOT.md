@@ -174,7 +174,7 @@ Some of the screens don't resize well at smaller widths. The CV Library was the 
 
 ---
 
-## Full technical review of the app (multi-persona)
+## Full technical review of the app (multi-persona) ✅ Complete
 
 A comprehensive review of the whole app, conducted from four different perspectives, each looking for different things:
 
@@ -183,7 +183,79 @@ A comprehensive review of the whole app, conducted from four different perspecti
 - **Code quality expert** — consistency of patterns across components, dead code, duplication, opportunities to simplify now that several features have grown organically (e.g. CSS organisation, shared component extraction).
 - **Test engineer** — coverage gaps, untested edge cases, whether the current 53-test suite reflects the app's actual surface area, opportunities for integration/E2E coverage of key flows (Import, Assembly, CV Library).
 
-**When to consider:** after the current run of feature work settles down — this is a "step back and take stock" exercise rather than a specific bug fix, best done when there isn't an active feature mid-flight.
+All four passes are complete, with prioritized plans at `UX-OPTIMIZATION.md`,
+`CODE-QUALITY-OPTIMIZATION.md`, and `TEST-OPTIMIZATION.md` (product architect
+findings were small enough to action directly — `appKnowledge.json` nav sync
+fixed, Dashboard onboarding overlap folded into `UX-OPTIMIZATION.md` item 9).
+A merged, phased implementation plan combining all three documents was drawn
+up to minimize repeated passes over the same files. Implementation is
+underway on branch `feature/optimization-plan-implementation`:
+
+- ✅ **Phase 0 — Shared primitives** (`0f4661d`): `shared.css` modal-overlay/
+  modal-dialog/icon-btn, new `ConfirmDialog.jsx`, `utils/dates.js`, `ipc.js`
+  PII logging fix, CLAUDE.md doc updates.
+- ✅ **Phase 1 — Backend test suite** (`0f4661d`): `db.test.js`,
+  `jobsAndTasks.test.js`, `aiRouteGuard.test.js` — full suite (100 tests)
+  passing.
+- ✅ **Phase 2 — Experience Pool** (`10c8ce8`): migrated to shared
+  `ConfirmDialog`/`.icon-btn`, added `@media (max-width: 900px)` responsive
+  fix for task rows + toolbar, aria-label sweep on remaining icon buttons.
+- ✅ **Phase 3 — Application Tracker** (`0293daf`): migrated export modal to
+  shared `.modal-overlay`/`.modal-dialog modal-dialog-wide`, replaced
+  `window.confirm` delete with `<ConfirmDialog>`, removed local `formatDate`
+  in favour of `utils/dates.js`, added `@media (max-width:900px)`
+  single-column responsive layout, fixed the "stray grey bar" root cause
+  (`.at-page` height/margin).
+- ✅ **Phase 4 — Education & Reference pages** (`bf525d0`): removed
+  duplicated local `.icon-btn` blocks, migrated deletes to
+  `<ConfirmDialog>`, aria-label sweep on icon-only buttons, `@media
+  (max-width:600px)` stacking fix for entry rows, confirmed Reference
+  Letters filename truncation already correct.
+- ✅ **Phase 5 — Assembly & dialogs** (`e4961a2`): `Assembly.css` now imports
+  `shared.css`; removed duplicated `.asm-dialog-overlay`/`.asm-dialog`/
+  `.asm-dialog-title`/`.asm-dialog-body`/`.asm-dialog-warning`/
+  `.asm-dialog-actions`/`.asm-dialog-wide`/`.pool-icon-btn` blocks.
+  Migrated `SaveAsCvModal`, `PoolBuildingBlocksDialog`,
+  `DeleteCvConfirmDialog`, `NavGuardDialog` (in `AssemblyPage.jsx`),
+  `StartNewCVDialog`, and `SaveToApplicationModal` to shared
+  `.modal-overlay`/`.modal-dialog`/`.modal-dialog-wide` classes with
+  `useFocusTrap` + `aria-labelledby`. Replaced `.pool-icon-btn` with
+  shared `.icon-btn` in `PoolDrawer.jsx` and `AIChatPanel.jsx`. Verified
+  via Playwright at 1400/900/380px and dark mode — New CV dialog no
+  longer overflows at 380x420 (UX-OPTIMIZATION item 4 fix confirmed).
+  Full test suite still 100/100.
+- ✅ **Phase 6 — CV Library & Settings** (`9d3a7b3`): `CVLibrary.css` now imports
+  `shared.css`; removed its duplicated local `.modal-overlay` (which had
+  a different opacity, 0.45 vs the shared 0.5) and renamed `.modal-box`/
+  `.modal-title`/`.modal-body-text`/`.modal-warning`/`.modal-actions` to
+  the shared `.modal-dialog`/`.modal-dialog-title`/`.modal-dialog-body`/
+  `.modal-dialog-warning`/`.modal-dialog-actions` (kept CVLibrary-specific
+  `.modal-form`/`.modal-label`/`.modal-input`/`.modal-optional` for the
+  Profile/Edit CV forms, which have no shared equivalent). Migrated
+  `DeleteConfirmModal` and `BulkDeleteConfirmModal` to `<ConfirmDialog>`
+  (extended `ConfirmDialog` to render `body` in a `<div>` instead of `<p>`
+  so it can take multi-paragraph JSX with a conditional
+  `.modal-dialog-warning` paragraph). Replaced both `window.confirm()`
+  calls in `Settings.jsx` (remove API key, restore backup) with
+  `<ConfirmDialog>`. `.cvlib-icon-btn` (bordered 30x30 row-action buttons,
+  already has aria-labels) deliberately left as-is — a genuinely different
+  visual style from the flat shared `.icon-btn`, not a redefinition of it.
+  CV Library's 900px responsive layout and aria-labels were already done
+  (reference implementation from the earlier responsiveness pass).
+  Verified at 1400/900/380px and dark mode via Playwright; full test suite
+  (100 tests) still passes.
+- ✅ **Phase 7 — Personal Details** (`82ed55b`): added `@media (max-width: 600px)`
+  rule to `PersonalDetails.css` switching `.personal-form-row` from
+  `flex-direction: row` to `column` (UX-OPTIMIZATION item 5) — fixes
+  "Place of Birth" being squeezed to ~50px/wrapping to three lines at
+  380px. Added `aria-label` to the `.link-remove` "×" button. Verified at
+  1400/900/380px and dark mode via Playwright; full test suite (100 tests)
+  still passes.
+- ⏳ **Phases 8–10**: not started (Dashboard onboarding design discussion,
+  recently-shipped feature tests, dark mode + Playwright last).
+
+Working tree is clean as of the end of this session — resume with Phase 8
+next.
 
 ---
 

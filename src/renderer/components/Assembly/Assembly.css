@@ -1,3 +1,5 @@
+@import '../../styles/shared.css';
+
 /* ── Page shell ──────────────────────────────────────────────────────────────── */
 
 .asm-page {
@@ -409,48 +411,6 @@ html.dark .asm-delete-btn:hover {
   padding: 40px 20px;
 }
 
-.asm-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.50);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.asm-dialog {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 28px;
-  width: 480px;
-  max-width: 92vw;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.asm-dialog-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--text-heading);
-}
-
-.asm-dialog-body {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.asm-dialog-warning {
-  color: var(--color-warning-text, #92400e);
-  background: var(--color-warning-bg, #fef3c7);
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-
 .asm-dialog-label {
   display: flex;
   flex-direction: column;
@@ -484,13 +444,6 @@ html.dark .asm-delete-btn:hover {
   border: 1px solid var(--color-error-border);
   border-radius: 4px;
   padding: 8px 10px;
-}
-
-.asm-dialog-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
 }
 
 /* ── Start mode cards ────────────────────────────────────────────────────────── */
@@ -621,23 +574,6 @@ html.dark .asm-mode-card.selected { background: var(--color-info-bg); }
   align-items: center;
   gap: 2px;
 }
-
-.pool-icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: background 0.12s, color 0.12s;
-}
-
-.pool-icon-btn:hover  { background: var(--bg-hover); color: var(--text-primary); }
-.pool-icon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .pool-icon {
   width: 16px;
@@ -1655,11 +1591,6 @@ html.dark .ai-ungrounded-accept {
 }
 
 /* ── SaveToApplicationModal ──────────────────────────────────────────────────── */
-
-/* Wider dialog variant for the application list */
-.asm-dialog-wide {
-  width: 560px;
-}
 
 /* Mode tabs (existing / new) */
 .asm-link-tabs {

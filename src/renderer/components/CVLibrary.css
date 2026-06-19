@@ -1,3 +1,5 @@
+@import '../styles/shared.css';
+
 /* ── Page shell ──────────────────────────────────────────────────────────────── */
 
 .cvlib {
@@ -410,48 +412,6 @@ html.dark .cvlib-icon-btn-danger:hover {
 
 /* ── Modals ──────────────────────────────────────────────────────────────────── */
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 24px;
-  width: 420px;
-  max-width: 90vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-}
-
-.modal-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-heading);
-  margin-bottom: 16px;
-}
-
-.modal-body-text {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.modal-warning {
-  color: var(--color-warning-text, #92400e);
-  background: var(--color-warning-bg, #fef3c7);
-  padding: 8px 12px;
-  border-radius: 6px;
-  margin-top: -8px;
-}
-
 .cvlib-subsection-desc {
   font-size: 12.5px;
   color: var(--text-muted);
@@ -482,13 +442,6 @@ html.dark .cvlib-icon-btn-danger:hover {
 }
 
 .modal-input:focus { outline: none; border-color: var(--color-primary); }
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 4px;
-}
 
 /* ── Responsive layout ───────────────────────────────────────────────────────── */
 

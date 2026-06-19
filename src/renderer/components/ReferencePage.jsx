@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { referenceAPI, taskAPI } from '../services/ipc';
 import { useToast } from '../contexts/ToastContext';
 import { Icon } from '../utils/icons';
+import ConfirmDialog from './ConfirmDialog';
 import './ReferencePage.css';
 
 function ReferenceCard({ reference, jobs, onSave, onDelete }) {
@@ -42,6 +43,7 @@ function ReferenceCard({ reference, jobs, onSave, onDelete }) {
           className="icon-btn delete-btn"
           onClick={() => onDelete(reference.id, reference.file_name)}
           title="Delete"
+          aria-label={`Delete ${reference.file_name}`}
         >
           <Icon.Delete className="icon" />
         </button>
@@ -77,7 +79,7 @@ function ReferenceCard({ reference, jobs, onSave, onDelete }) {
               {tags.map(t => (
                 <span key={t} className="ref-tag">
                   {t}
-                  <button className="tag-remove-btn" onClick={() => removeTag(t)}>×</button>
+                  <button className="tag-remove-btn" onClick={() => removeTag(t)} aria-label={`Remove tag ${t}`}>×</button>
                 </span>
               ))}
             </div>
@@ -106,6 +108,7 @@ export default function ReferencePage() {
   const [references, setReferences] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(null); // { id, fileName }
   const fileInputRef = useRef(null);
   const showToast = useToast();
 
@@ -136,13 +139,17 @@ export default function ReferencePage() {
     } catch (err) { setError(err.message); }
   }
 
-  async function handleDelete(id, fileName) {
-    if (!window.confirm(`Delete "${fileName}"? This will also remove the stored file.`)) return;
+  function handleDelete(id, fileName) {
+    setConfirmDelete({ id, fileName });
+  }
+
+  async function confirmDeleteReference() {
     try {
-      await referenceAPI.delete(id);
+      await referenceAPI.delete(confirmDelete.id);
       load();
       showToast('Deleted.');
     } catch (err) { setError(err.message); }
+    finally { setConfirmDelete(null); }
   }
 
   async function handleUpload(e) {
@@ -193,6 +200,16 @@ export default function ReferencePage() {
           />
         ))}
       </div>
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Delete this document?"
+          body={`Delete "${confirmDelete.fileName}"? This will also remove the stored file. This cannot be undone.`}
+          confirmLabel="Delete"
+          onConfirm={confirmDeleteReference}
+          onCancel={() => setConfirmDelete(null)}
+        />
+      )}
     </div>
   );
 }

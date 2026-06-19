@@ -589,11 +589,11 @@ function SaveAsCvModal({ currentTitle, currentProfileId, profiles, onConfirm, on
   }
 
   return (
-    <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && onClose()}>
-      <div className="asm-dialog" role="dialog" aria-modal="true"
+    <div className="modal-overlay" onKeyDown={e => e.key === 'Escape' && onClose()}>
+      <div className="modal-dialog" role="dialog" aria-modal="true"
            aria-labelledby="save-as-title" ref={ref}>
-        <h2 className="asm-dialog-title" id="save-as-title">Save as new draft</h2>
-        <p className="asm-dialog-body">
+        <h2 className="modal-dialog-title" id="save-as-title">Save as new draft</h2>
+        <p className="modal-dialog-body">
           Creates a new CV with the current content. The original draft is left unchanged.
         </p>
 
@@ -622,7 +622,7 @@ function SaveAsCvModal({ currentTitle, currentProfileId, profiles, onConfirm, on
           </select>
         </label>
 
-        <div className="asm-dialog-actions">
+        <div className="modal-dialog-actions">
           <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={saving}>
             Cancel
           </button>
@@ -722,11 +722,11 @@ function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
   }
 
   return (
-    <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && onClose()}>
-      <div className="asm-dialog asm-dialog-wide" role="dialog" aria-modal="true"
+    <div className="modal-overlay" onKeyDown={e => e.key === 'Escape' && onClose()}>
+      <div className="modal-dialog modal-dialog-wide" role="dialog" aria-modal="true"
            aria-labelledby="bb-dialog-title" ref={ref}>
-        <h2 className="asm-dialog-title" id="bb-dialog-title">Save as building blocks?</h2>
-        <p className="asm-dialog-body">
+        <h2 className="modal-dialog-title" id="bb-dialog-title">Save as building blocks?</h2>
+        <p className="modal-dialog-body">
           {items.length === 1
             ? 'This bullet isn\'t in your experience pool yet.'
             : `${items.length} bullets aren't in your experience pool yet.`
@@ -809,7 +809,7 @@ function PoolBuildingBlocksDialog({ items, onConfirm, onClose }) {
           })}
         </div>
 
-        <div className="asm-dialog-actions">
+        <div className="modal-dialog-actions">
           <button className="btn btn-ghost btn-sm" onClick={onClose} disabled={saving}>
             Cancel
           </button>
@@ -835,20 +835,20 @@ function DeleteCvConfirmDialog({ title, linkedApps, deleting, onConfirm, onCance
   const ref = useRef(null);
   useFocusTrap(true, ref);
   return (
-    <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && !deleting && onCancel()}>
-      <div className="asm-dialog" role="alertdialog" aria-modal="true"
+    <div className="modal-overlay" onKeyDown={e => e.key === 'Escape' && !deleting && onCancel()}>
+      <div className="modal-dialog" role="alertdialog" aria-modal="true"
            aria-labelledby="delete-cv-title" ref={ref}>
-        <h2 className="asm-dialog-title" id="delete-cv-title">Delete this CV?</h2>
-        <p className="asm-dialog-body">
+        <h2 className="modal-dialog-title" id="delete-cv-title">Delete this CV?</h2>
+        <p className="modal-dialog-body">
           Delete <strong>{title || 'this CV'}</strong>? This cannot be undone.
         </p>
         {linkedApps > 0 && (
-          <p className="asm-dialog-body asm-dialog-warning">
+          <p className="modal-dialog-body modal-dialog-warning">
             This CV is linked to {linkedApps} application{linkedApps !== 1 ? 's' : ''}.
             Deleting it will remove the link — the application record will remain but without a CV attached.
           </p>
         )}
-        <div className="asm-dialog-actions">
+        <div className="modal-dialog-actions">
           <button className="btn btn-ghost btn-sm" onClick={onCancel} disabled={deleting}>Cancel</button>
           <button className="btn btn-danger btn-sm" onClick={onConfirm} disabled={deleting}>
             {deleting ? 'Deleting…' : 'Delete'}
@@ -865,14 +865,14 @@ function NavGuardDialog({ onSaveAndLeave, onDiscard, onStay }) {
   const ref = useRef(null);
   useFocusTrap(true, ref);
   return (
-    <div className="asm-dialog-overlay" onKeyDown={e => e.key === 'Escape' && onStay()}>
-      <div className="asm-dialog" role="alertdialog" aria-modal="true"
+    <div className="modal-overlay" onKeyDown={e => e.key === 'Escape' && onStay()}>
+      <div className="modal-dialog" role="alertdialog" aria-modal="true"
            aria-labelledby="nav-guard-title" ref={ref}>
-        <h2 className="asm-dialog-title" id="nav-guard-title">Unsaved changes</h2>
-        <p className="asm-dialog-body">
+        <h2 className="modal-dialog-title" id="nav-guard-title">Unsaved changes</h2>
+        <p className="modal-dialog-body">
           You have changes that haven't been saved yet. What would you like to do?
         </p>
-        <div className="asm-dialog-actions">
+        <div className="modal-dialog-actions">
           <button className="btn btn-ghost btn-sm"  onClick={onStay}>Stay</button>
           <button className="btn btn-danger btn-sm" onClick={onDiscard}>Discard changes</button>
           <button className="btn btn-primary btn-sm" onClick={onSaveAndLeave}>Save and leave</button>

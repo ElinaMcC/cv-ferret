@@ -10,10 +10,10 @@ const api = {
     if (body) options.body = JSON.stringify(body);
 
     const url = `${API_BASE}${path}`;
-    console.log('[api] request', method, url, body);
+    if (import.meta.env.DEV) console.log('[api] request', method, url, body);
     const response = await fetch(url, options);
     const text = await response.text();
-    console.log('[api] response status:', response.status, 'body:', text);
+    if (import.meta.env.DEV) console.log('[api] response status:', response.status, 'body:', text);
 
     if (!response.ok) {
       let message;

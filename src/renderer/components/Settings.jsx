@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { settingsAPI, exportAPI } from '../services/ipc';
 import { useToast } from '../contexts/ToastContext';
 import { useAppSettings } from '../contexts/AppSettingsContext';
+import ConfirmDialog from './ConfirmDialog.jsx';
 import './Settings.css';
 
 export default function Settings() {
@@ -20,6 +21,8 @@ export default function Settings() {
   const [personas, setPersonas] = useState([]);
   const [newPersonaName, setNewPersonaName] = useState('');
   const [error, setError] = useState('');
+  const [confirmClearKey, setConfirmClearKey] = useState(false);
+  const [pendingRestore, setPendingRestore] = useState(null);
   const showToast = useToast();
 
   useEffect(() => { load(); }, []);
@@ -65,7 +68,11 @@ export default function Settings() {
   }
 
   async function handleClear() {
-    if (!window.confirm('Remove the API key? AI features will stop working.')) return;
+    setConfirmClearKey(true);
+  }
+
+  async function confirmClear() {
+    setConfirmClearKey(false);
     try {
       await settingsAPI.updateSettings({ anthropicApiKey: '' });
       setHasKey(false);
@@ -440,6 +447,26 @@ export default function Settings() {
           Immersive Translate browser extension.
         </p>
       </div>
+
+      {confirmClearKey && (
+        <ConfirmDialog
+          title="Remove the API key?"
+          body="AI features will stop working until a new key is added."
+          confirmLabel="Remove"
+          onConfirm={confirmClear}
+          onCancel={() => setConfirmClearKey(false)}
+        />
+      )}
+
+      {pendingRestore && (
+        <ConfirmDialog
+          title="Restore from backup?"
+          body="This will replace ALL current data with the backup. This cannot be undone."
+          confirmLabel="Restore"
+          onConfirm={confirmImportBackup}
+          onCancel={() => setPendingRestore(null)}
+        />
+      )}
     </div>
   );
 
@@ -552,7 +579,16 @@ export default function Settings() {
     try {
       const text = await file.text();
       const parsed = JSON.parse(text);
-      if (!window.confirm('This will replace ALL current data with the backup. Are you sure?')) return;
+      setPendingRestore(parsed);
+    } catch (err) {
+      setError(err.message || 'Failed to restore — is this a valid backup file?');
+    }
+  }
+
+  async function confirmImportBackup() {
+    const parsed = pendingRestore;
+    setPendingRestore(null);
+    try {
       await exportAPI.restoreBackup(parsed);
       showToast('Data restored. Refresh the page to see the updated data.');
     } catch (err) {
