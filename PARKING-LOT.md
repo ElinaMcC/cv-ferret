@@ -259,6 +259,17 @@ next.
 
 ---
 
+## Guided setup walkthrough
+
+A "walk me through setup" mode on the Dashboard — a step-by-step wizard that guides new users through each setup task in sequence. Key design notes:
+
+- Tasks should be user-controlled: each step has explicit "Mark complete" and "Come back to this" options, rather than auto-detecting completion from data state (which can be misleading — a user may have data but want to review it before ticking it off).
+- Consider whether this should replace the current checklist entirely, or sit alongside it as an opt-in mode for users who want more hand-holding.
+- The import step should be first and prominent; settings (export path, API key) should follow; pool refinement last.
+- When to consider: after the Dashboard onboarding redesign (Phase 8) is stable.
+
+---
+
 ## Bulk edit for experience pool task descriptions
 
 Over time, users might end up with quite many versions of each task description, with minor differences. It would be useful to offer cleanup features that let users delete multiple building blocks at once. There are some questions that need to be answered first. Users will need clarity about what happens if a given building block is currently in use in a CV draft. Should bulk delete only be possible within a particular job, or across all building blocks for all jobs in the pool?
