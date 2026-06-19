@@ -251,11 +251,117 @@ underway on branch `feature/optimization-plan-implementation`:
   380px. Added `aria-label` to the `.link-remove` "×" button. Verified at
   1400/900/380px and dark mode via Playwright; full test suite (100 tests)
   still passes.
-- ⏳ **Phases 8–10**: not started (Dashboard onboarding design discussion,
-  recently-shipped feature tests, dark mode + Playwright last).
+- ✅ **Phase 8 — Dashboard onboarding** (`d9d1481`): replaced "How it
+  works" guide, import invitation card, and setup checklist with a single
+  "Getting started" section. Import is now the primary first step; manual
+  entry is offered as a subordinated alternative. "Before you start" pared
+  down to two actionable settings items. Steps 3–5 reframed as outcomes
+  (what you can do) rather than data-entry tasks. Guided setup wizard idea
+  parked in PARKING-LOT.md for future. Branch:
+  `feature/phase-8-dashboard-onboarding`.
+- ⏳ **Phases 9–10**: not started (recently-shipped feature tests, dark mode
+  + Playwright last).
 
 Working tree is clean as of the end of this session — resume with Phase 8
 next.
+
+---
+
+## Unified manual import template (ready to implement)
+
+Replace the current two-template manual import flow (separate experience and education JSON files, plus a "go fill in personal details yourself" step) with a single combined JSON template covering all sections. This also fixes the inconsistency between the Dashboard "Getting started" copy (which implies personal details are always extracted on import) and the manual path (which currently can't import them at all).
+
+### Why it's straightforward
+
+The backend `POST /api/import/import-all` already accepts a combined payload:
+`{ personalDetails, jobs, education, training, skills, languages, overwritePersonal }`.
+No backend changes are needed — this is purely a frontend improvement.
+
+### Implementation plan
+
+**1. New combined template constant in `ImportPage.jsx`**
+
+Replace `EXPERIENCE_TEMPLATE` and `EDUCATION_TEMPLATE` with a single `CV_TEMPLATE`:
+
+```json
+{
+  "personalDetails": {
+    "first_name": "", "last_name": "", "email": "", "phone": "",
+    "address": "", "links": [], "date_of_birth": "", "place_of_birth": "", "gender": ""
+  },
+  "jobs": [{
+    "employer": "Example Company", "job_title": "Job Title",
+    "start_date": "2020-01-15", "end_date": null, "location": "City, Country",
+    "notes": "",
+    "tasks": [{ "description": "One bullet point per task.", "tags": [], "role_priorities": [] }]
+  }],
+  "education": [{ "institution": "University", "title": "Degree", "end_date": "Jun 2018", "notes": "" }],
+  "training":  [{ "institution": "Provider", "title": "Certificate", "end_date": "Mar 2023", "notes": "" }],
+  "skills": ["Skill One", "Skill Two"],
+  "languages": [{ "language": "German", "level": "C1" }]
+}
+```
+
+**2. Rewrite `ManualPath` component**
+
+Replace the three separate steps (personal → navigate, experience → JSON upload,
+education → JSON upload) with a single flow:
+
+- Brief instruction: "Download the template, fill it in with your data, and upload it."
+- One `TemplateDownload` button for `cv-template.json`
+- One JSON file upload (replacing the two `ManualJsonImport` instances)
+- Checkbox: **"Update personal details"** — unchecked by default. Shown only if `personalDetails`
+  fields are present in the uploaded file. Warning: "This will overwrite your existing personal
+  details." Mirrors the same opt-in behaviour as the AI preview path.
+- "Import" button → calls `importAPI.importAll({ ...data, overwritePersonal })`
+- Inline success summary (reuse/extend the existing `buildSuccessMsg` / `ImportSummary` logic
+  to cover all sections including personal)
+
+**3. Simplify or retire `ManualJsonImport`**
+
+The existing `ManualJsonImport` component handles the experience/education split with an
+`isExperience` flag. With the combined template it's no longer needed in that form —
+fold the upload/parse/import logic directly into the new `ManualPath`, or extract a
+simpler `CombinedJsonImport` component if the logic warrants it.
+
+**4. Update copy in `Dashboard.jsx`**
+
+With personal details now importable via both paths, remove any planned AI caveat
+from the Getting Started step 1 description — the claim "extract your personal details"
+is now accurate for both paths (automatically via AI, or via the combined template).
+
+**5. Update the `ManualPath` tile description in `ChoosePath`**
+
+Current: "Download JSON templates, prepare your data using any tool you like, and upload
+the files section by section."
+New: "Download a single JSON template, fill it in, and upload it to import everything at once."
+
+### Files affected
+
+- `src/renderer/components/ImportPage.jsx` — all changes live here
+- `src/renderer/components/Dashboard.jsx` — minor copy tweak only
+
+### Notes
+
+- `importAPI.importAll()` is already wired up in `ipc.js` and used by the AI preview path —
+  reuse it directly for the manual path.
+- Keep the separate `importAPI.importExperience()` and `importAPI.importEducation()` calls
+  in `ipc.js` for now (don't delete them until confirmed nothing else calls them).
+- The `overwritePersonal` checkbox should default to **unchecked** regardless of whether
+  personal details data already exists — matching the AI path's conservative default.
+- If the uploaded JSON has no `personalDetails` key, or all its string fields are empty,
+  suppress the checkbox entirely (nothing to overwrite with).
+
+---
+
+## Guided setup walkthrough
+
+A "walk me through setup" mode on the Dashboard — a step-by-step wizard that guides new users through each setup task in sequence. Key design notes:
+
+- Tasks should be user-controlled: each step has explicit "Mark complete" and "Come back to this" options, rather than auto-detecting completion from data state (which can be misleading — a user may have data but want to review it before ticking it off).
+- Consider whether this should replace the current checklist entirely, or sit alongside it as an opt-in mode for users who want more hand-holding.
+- The import step should be first and prominent; settings (export path, API key) should follow; pool refinement last.
+- When to consider: after the Dashboard onboarding redesign (Phase 8) is stable.
 
 ---
 

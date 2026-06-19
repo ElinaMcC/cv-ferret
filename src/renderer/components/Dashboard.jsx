@@ -15,35 +15,23 @@ function formatRelativeDate(isoString) {
   return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-const FLOW_STEPS = [
-  {
-    num: 1,
-    title: 'Personal Details',
-    desc: 'Add your name, contact information, and links.',
-    view: 'personal',
-  },
-  {
-    num: 2,
-    title: 'Experience Pool',
-    desc: 'Add your jobs and task bullet points. Each task can have multiple versions tailored to different roles.',
-    view: 'experience-pool',
-  },
+const WHAT_YOU_CAN_DO = [
   {
     num: 3,
-    title: 'Education & Skills',
-    desc: 'Add your education, training, certifications, skills, and languages.',
-    view: 'education',
+    title: 'Experience Pool',
+    desc: 'Review your imported tasks and create multiple versions of each bullet point, each tailored to a different type of role.',
+    view: 'experience-pool',
   },
   {
     num: 4,
     title: 'CV Library & Assembly',
-    desc: 'Organise CVs into profiles, or start a new one in the Assembly. Select tasks from your pool, choose versions, write freely, and export as PDF or DOCX.',
+    desc: 'Select tasks from your pool, arrange them, and export your CV as PDF or DOCX.',
     view: 'cv-library',
   },
   {
     num: 5,
     title: 'Application Tracker',
-    desc: 'Log each application, write cover letters, track your status, and export finished documents.',
+    desc: 'Log applications, write a cover letter per application, and track your status.',
     view: 'applications',
   },
 ];
@@ -52,22 +40,13 @@ export default function Dashboard({ onNavigate }) {
   const { aiEnabled } = useAppSettings();
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
-  const [showFlow, setShowFlow] = useState(false);
-  const [importInviteDismissed, setImportInviteDismissed] = useState(
-    () => localStorage.getItem('importInviteDismissed') === 'true'
-  );
-
-  function dismissImportInvite() {
-    localStorage.setItem('importInviteDismissed', 'true');
-    setImportInviteDismissed(true);
-  }
+  const [showGuide, setShowGuide] = useState(false);
 
   useEffect(() => {
     dashboardAPI.getSummary()
       .then(d => {
         setData(d);
-        // Expand the flow guide automatically for brand-new users.
-        if (d.stats.jobCount === 0 && d.stats.cvDocumentCount === 0) setShowFlow(true);
+        if (d.stats.jobCount === 0 && d.stats.cvDocumentCount === 0) setShowGuide(true);
       })
       .catch(err => setError(err.message));
   }, []);
@@ -75,43 +54,8 @@ export default function Dashboard({ onNavigate }) {
   if (error) return <div className="db-page"><p className="db-error">{error}</p></div>;
   if (!data) return <div className="db-page db-loading">Loading…</div>;
 
-  const { setup, stats } = data;
+  const { stats } = data;
   const isNew = stats.jobCount === 0 && stats.cvDocumentCount === 0;
-
-  const checklist = [
-    {
-      id: 'personal',
-      done: setup.hasPersonalDetails,
-      label: 'Personal details',
-      detail: 'Add your name and contact information',
-      view: 'personal',
-    },
-    ...(setup.aiEnabled ? [{
-      id: 'apikey',
-      done: setup.hasApiKey,
-      label: 'Anthropic API key',
-      detail: setup.hasApiKey
-        ? 'API key configured'
-        : 'AI features are on but will fail without a key — add one in Settings, or turn AI off',
-      view: 'settings',
-    }] : []),
-    {
-      id: 'export',
-      done: setup.hasExportPath,
-      label: 'Export path',
-      detail: 'Where exported CV and cover letter files are saved',
-      view: 'settings',
-    },
-    {
-      id: 'jobs',
-      done: setup.hasJobs,
-      label: 'Experience added',
-      detail: 'Add at least one job to your experience pool',
-      view: 'experience-pool',
-    },
-  ];
-
-  const incomplete = checklist.filter(c => !c.done);
 
   return (
     <div className="db-page">
@@ -122,56 +66,6 @@ export default function Dashboard({ onNavigate }) {
           and tracking job applications — all on your own machine.
         </p>
       </div>
-
-      {/* Import invitation — shown until the user has added any experience */}
-      {stats.jobCount === 0 && !importInviteDismissed && (
-        <section className="db-card db-import-invite" aria-labelledby="import-invite-heading">
-          <button
-            className="db-import-invite-dismiss"
-            onClick={dismissImportInvite}
-            aria-label="Dismiss"
-          >×</button>
-          <h2 id="import-invite-heading">Already have a CV?</h2>
-          <p className="db-import-invite-text">
-            Get started in minutes — upload your existing CV and CV Ferret will pull out your
-            jobs, education, and skills automatically.
-          </p>
-          <button className="btn btn-primary" onClick={() => onNavigate('import')}>
-            Import your CV →
-          </button>
-        </section>
-      )}
-
-      {/* Setup checklist — shown while any item is incomplete */}
-      {incomplete.length > 0 && (
-        <section className="db-card db-setup" aria-labelledby="setup-heading">
-          <h2 id="setup-heading">Getting started</h2>
-          <p className="db-setup-intro">
-            Complete these steps to get the most out of the app:
-          </p>
-          <ul className="db-checklist">
-            {checklist.map(item => (
-              <li key={item.id} className={`db-check-item ${item.done ? 'done' : ''}`}>
-                <span className="db-check-icon" aria-hidden="true">
-                  {item.done ? '✓' : '○'}
-                </span>
-                <span className="db-check-text">
-                  <strong>{item.label}</strong>
-                  <span className="db-check-detail"> — {item.detail}</span>
-                </span>
-                {!item.done && (
-                  <button
-                    className="db-check-btn"
-                    onClick={() => onNavigate(item.view)}
-                  >
-                    Set up →
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       {/* Stats summary — shown once data exists */}
       {!isNew && (
@@ -220,77 +114,83 @@ export default function Dashboard({ onNavigate }) {
         </section>
       )}
 
-      {/* Recommended flow */}
-      <section className="db-card" aria-labelledby="flow-heading">
+      {/* Getting started guide */}
+      <section className="db-card" aria-labelledby="guide-heading">
         <div className="db-flow-header">
-          <h2 id="flow-heading">How it works</h2>
+          <h2 id="guide-heading">Getting started</h2>
           <button
             className="db-toggle-btn"
-            onClick={() => setShowFlow(v => !v)}
-            aria-expanded={showFlow}
-            aria-controls="flow-steps"
+            onClick={() => setShowGuide(v => !v)}
+            aria-expanded={showGuide}
+            aria-controls="guide-steps"
           >
-            {showFlow ? 'Hide' : 'Show'}
+            {showGuide ? 'Hide' : 'Show'}
           </button>
         </div>
 
-        {showFlow && (
-          <div id="flow-steps">
-            <div className="db-prereqs">
-              <strong>Before you start</strong>
-              <ul className="db-prereq-list">
-                <li>
-                  Go to <button className="db-inline-link" onClick={() => onNavigate('personal')}>Personal Details</button> and add your name and contact information — these appear in every CV header.
-                </li>
-                <li>
-                  Go to <button className="db-inline-link" onClick={() => onNavigate('settings')}>Settings</button> and set your <strong>Export Path</strong> — the folder where CV and cover letter files will be saved.
-                </li>
-                <li>
-                  <strong>AI features are off by default.</strong> To enable them, go to Settings, turn on <strong>AI Features</strong>, and add your <strong>Anthropic API key</strong>. Without the key the Generate buttons will appear but won't work.{' '}
-                  <strong>Note:</strong> the Anthropic API is a paid, pay-as-you-go service — typical usage costs a few cents per generation, but review{' '}
-                  <span className="db-text-note">anthropic.com/pricing</span> before enabling. New accounts include a small free credit to get started. If you prefer to work without AI, leave the toggle off — all manual features work independently.
-                </li>
-              </ul>
-            </div>
-            <ol className="db-flow-steps">
-            {FLOW_STEPS.map(step => (
-              <li key={step.num} className={`db-flow-step${step.isSplit ? ' db-flow-step-split' : ''}`}>
+        {showGuide && (
+          <ol className="db-flow-steps" id="guide-steps">
+
+            {/* Step 1: Get your data in */}
+            <li className="db-flow-step">
+              <span className="db-step-num" aria-hidden="true">1</span>
+              <div className="db-step-body">
+                <strong>Get your data in</strong>
+                <p className="db-step-desc">
+                  Upload your existing CV and CV Ferret will extract your work history,
+                  education, skills, and personal details automatically.
+                </p>
+                <button className="btn btn-primary db-step-cta" onClick={() => onNavigate('import')}>
+                  Import your CV →
+                </button>
+                <p className="db-step-hint">
+                  Prefer to start fresh? Add everything manually via the{' '}
+                  <button className="db-inline-link" onClick={() => onNavigate('experience-pool')}>Experience Pool</button>,{' '}
+                  <button className="db-inline-link" onClick={() => onNavigate('education')}>Education &amp; Skills</button>, and{' '}
+                  <button className="db-inline-link" onClick={() => onNavigate('personal')}>Personal Details</button> pages.
+                </p>
+              </div>
+            </li>
+
+            {/* Step 2: Set up before you export */}
+            <li className="db-flow-step">
+              <span className="db-step-num" aria-hidden="true">2</span>
+              <div className="db-step-body">
+                <strong>Set up before you export</strong>
+                <ul className="db-prereq-list">
+                  <li>
+                    Set your <strong>Export path</strong> in{' '}
+                    <button className="db-inline-link" onClick={() => onNavigate('settings')}>Settings</button>
+                    {' '}— the folder where exported CVs and cover letters will be saved.
+                  </li>
+                  {aiEnabled && (
+                    <li>
+                      Add your <strong>Anthropic API key</strong> in{' '}
+                      <button className="db-inline-link" onClick={() => onNavigate('settings')}>Settings</button>
+                      {' '}to enable AI features. CV Ferret uses Anthropic's pay-as-you-go API —
+                      check <span className="db-text-note">anthropic.com/pricing</span> before enabling.
+                      New accounts include a small free credit.
+                    </li>
+                  )}
+                </ul>
+              </div>
+            </li>
+
+            {/* Steps 3–5: What you can do */}
+            {WHAT_YOU_CAN_DO.map(step => (
+              <li key={step.num} className="db-flow-step">
                 <span className="db-step-num" aria-hidden="true">{step.num}</span>
-                {step.isSplit ? (
-                  <div className="db-step-body">
-                    <strong>{step.title}</strong>
-                    <div className="db-step-options">
-                      {step.options.map(opt => (
-                        <div key={opt.view} className="db-step-option">
-                          <div className="db-step-option-text">
-                            <strong>{opt.title}</strong>
-                            <span className="db-step-desc"> — {opt.desc}</span>
-                          </div>
-                          <button className="db-check-btn" onClick={() => onNavigate(opt.view)}>
-                            Go →
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="db-step-body">
-                      <strong>{step.title}</strong>
-                      <span className="db-step-desc"> — {step.desc}</span>
-                    </div>
-                    <button
-                      className="db-check-btn"
-                      onClick={() => onNavigate(step.view)}
-                    >
-                      Go →
-                    </button>
-                  </>
-                )}
+                <div className="db-step-body">
+                  <strong>{step.title}</strong>
+                  <span className="db-step-desc"> — {step.desc}</span>
+                </div>
+                <button className="db-check-btn" onClick={() => onNavigate(step.view)}>
+                  Go →
+                </button>
               </li>
             ))}
+
           </ol>
-          </div>
         )}
       </section>
 
