@@ -13,7 +13,7 @@
 .personal-error {
   padding: 12px;
   background-color: var(--color-error-bg);
-  border-left: 4px solid #f00;
+  border-left: 4px solid var(--color-error-text);
   border-radius: 4px;
   color: var(--color-error-text);
   margin-bottom: 16px;
@@ -91,7 +91,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  background: #f8f8f8;
+  background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   border-radius: 4px;
   font-size: 13px;
@@ -122,7 +122,7 @@
 }
 
 .link-remove:hover {
-  color: #e74c3c;
+  color: var(--color-error-text);
 }
 
 /* Save area */

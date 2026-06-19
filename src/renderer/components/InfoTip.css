@@ -8,13 +8,13 @@
 
 .infotip-trigger {
   background: none;
-  border: 1px solid #bbb;
+  border: 1px solid var(--border);
   border-radius: 50%;
   width: 16px;
   height: 16px;
   font-size: 10px;
   line-height: 1;
-  color: #888;
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -25,8 +25,8 @@
 
 .infotip-trigger:hover,
 .infotip-trigger[aria-expanded="true"] {
-  background: #3498db;
-  border-color: #3498db;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
   color: white;
 }
 
@@ -35,8 +35,8 @@
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  background: #1a1a2e;
-  color: #f0f0f0;
+  background: var(--text-heading);
+  color: var(--bg-app);
   font-size: 12px;
   line-height: 1.55;
   padding: 9px 12px;
@@ -55,5 +55,5 @@
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: #1a1a2e;
+  border-top-color: var(--text-heading);
 }
