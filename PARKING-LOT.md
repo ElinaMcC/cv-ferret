@@ -251,11 +251,23 @@ underway on branch `feature/optimization-plan-implementation`:
   380px. Added `aria-label` to the `.link-remove` "×" button. Verified at
   1400/900/380px and dark mode via Playwright; full test suite (100 tests)
   still passes.
-- ⏳ **Phases 8–10**: not started (Dashboard onboarding design discussion,
-  recently-shipped feature tests, dark mode + Playwright last).
+- ✅ **Phase 8 — Dashboard onboarding** (`d9d1481` on `feature/phase-8-dashboard-onboarding`):
+  replaced "How it works" guide, import invitation card, and setup checklist
+  with a single "Getting started" section. Import is the primary first step;
+  manual entry is offered as a subordinated alternative. "Before you start"
+  pared to two items (export path + API key). Steps 3–5 reframed as outcomes.
+  Checklist removed; guided wizard idea parked in PARKING-LOT.md below.
+- ✅ **Phase 9 — Feature tests** (`464f05c` on `feature/phase-9-tests`):
+  `import.test.js` (17 tests: `importExperience` round-trips, empty-
+  description skipping, whitespace trimming, tag/role-priority storage;
+  `importEducation` skill deduplication, language upserts, partial payloads)
+  and `cvLibrary.test.js` (25 tests: `batchDeleteCvDocuments` cross-
+  reference nulling, `batchMoveCvDocuments` profile reassignment,
+  `batchDeleteProfiles` with/without `deleteCvDocs`, `batchDeleteJobs` and
+  `batchDeleteTasks` cascade deletion). Full suite: 142/142 passing.
+- ⏳ **Phase 10**: not started (dark mode audit + Playwright smoke suite).
 
-Working tree is clean as of the end of this session — resume with Phase 8
-next.
+Working tree is clean as of the end of this session.
 
 ---
 
