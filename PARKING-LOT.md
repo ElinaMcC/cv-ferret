@@ -251,8 +251,16 @@ underway on branch `feature/optimization-plan-implementation`:
   380px. Added `aria-label` to the `.link-remove` "×" button. Verified at
   1400/900/380px and dark mode via Playwright; full test suite (100 tests)
   still passes.
-- ⏳ **Phases 8–10**: not started (Dashboard onboarding design discussion,
-  recently-shipped feature tests, dark mode + Playwright last).
+- ✅ **Phase 8 — Dashboard onboarding** (`d9d1481`): replaced "How it
+  works" guide, import invitation card, and setup checklist with a single
+  "Getting started" section. Import is now the primary first step; manual
+  entry is offered as a subordinated alternative. "Before you start" pared
+  down to two actionable settings items. Steps 3–5 reframed as outcomes
+  (what you can do) rather than data-entry tasks. Guided setup wizard idea
+  parked in PARKING-LOT.md for future. Branch:
+  `feature/phase-8-dashboard-onboarding`.
+- ⏳ **Phases 9–10**: not started (recently-shipped feature tests, dark mode
+  + Playwright last).
 
 Working tree is clean as of the end of this session — resume with Phase 8
 next.
