@@ -245,3 +245,28 @@ hover bg, bubble bg/text/arrow). All variables already defined in `index.css`
 for both themes — no new variables needed.
 
 Unit suite: 142/142. E2E suite: 9/9.
+
+---
+
+## Unified manual import (single template + shared preview)
+
+Replaced the three-step manual import flow (separate experience and education
+JSON templates, personal details handled by a "go fill it in yourself" redirect)
+with a single combined JSON template covering all sections. The manual path now
+feeds into the same `ImportPreview` review screen as the AI path, giving users
+an edit-before-commit experience regardless of import method.
+
+Also added an existing-data warning on the choose-path screen: when the
+Experience Pool is non-empty, users are informed that import is additive and
+does not deduplicate — with a direct link to the pool to check before proceeding.
+
+**Changes:**
+- `src/renderer/components/ImportPage.jsx` — single `CV_TEMPLATE` constant;
+  `ManualPath` reduced to file upload → parse → `ImportPreview`; existing-data
+  warning fetched via `dashboardAPI.getSummary()`
+- `src/renderer/components/ImportPage.css` — removed old step-card styles;
+  added warning banner styles
+- `src/renderer/components/ImportPreview.jsx` — copy made path-neutral
+  ("Review before importing" / "Review the data below…")
+
+**Landed:** commit `a95d2f3` on `feature/phase-9-tests`
