@@ -118,7 +118,7 @@ guides new users through each setup task in sequence. Key design notes:
   alongside it as an opt-in mode.
 - The import step should be first and prominent; settings (export path, API key)
   should follow; pool refinement last.
-- When to consider: after the Dashboard onboarding redesign (Phase 8) is stable.
+- Phase 8 is now complete — this is ready to consider.
 
 ---
 
@@ -150,7 +150,7 @@ with job-ad-tailored versions over time.
 **Token/cost note:** rewrites the full pool in one call — could be expensive.
 Mitigation: compress pool to default versions only; warn user before generating.
 
-**When to consider:** now that the Import page and core workflow are stable.
+**When to consider:** the Import page and core workflow are now stable — this is ready to consider.
 
 ---
 
