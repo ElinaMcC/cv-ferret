@@ -5,6 +5,49 @@ Completed work lives in `DONE.md`.
 
 ---
 
+## Pool export and ID-aware reimport
+
+Allow users to export their Experience Pool (and optionally education, skills,
+and languages) as a JSON file in the same format as the import template — but
+with internal IDs included. This creates a clean round-trip workflow:
+
+1. **Export** — download the pool as JSON with IDs, employer names, job titles,
+   dates, and all task versions intact.
+2. **Edit externally** — add new task versions, tweak wording, restructure, or
+   use the data in other tools entirely.
+3. **Reimport** — upload the edited JSON. Jobs whose `id` matches an existing
+   pool entry have tasks merged in rather than creating a duplicate job entry.
+   Jobs without an `id` (or with an unrecognised one) are treated as new, as
+   today.
+
+**Why it matters for the target audience:** a technical user who already has CV
+data in another tool (Notion, Obsidian, a spreadsheet, a bespoke script) gets
+a stable, documented JSON contract to work against. CV Ferret becomes
+interoperable rather than a walled garden, which is consistent with its
+local-first, transparency-first ethos.
+
+**Design notes:**
+- The export format should be a strict superset of the import template — every
+  valid export is a valid import, just with IDs added. No separate schema to
+  maintain.
+- IDs only matter at the job level for deduplication. Task IDs could be included
+  for completeness (and future update-in-place scenarios) but aren't needed for
+  the core merge behaviour.
+- `ImportPreview` should make the merge behaviour visible: imported jobs that
+  matched an existing entry should be labelled "merging into existing job" rather
+  than "new job", so the user can see what will happen before confirming.
+- A fuzzy-match fallback (employer + title) could be offered as a suggestion
+  in `ImportPreview` for JSONs without IDs, letting users opt in to merging
+  without needing to know the ID.
+- Export should live on the Experience Pool page (and/or a dedicated Data
+  page if one is ever added), not buried in Settings.
+
+**When to consider:** after the Import page is stable. Export is a prerequisite
+for the ID-aware reimport to be practical — without it, users would need to
+inspect internal data to find IDs.
+
+---
+
 ## Guided setup walkthrough
 
 A "walk me through setup" mode on the Dashboard — a step-by-step wizard that
