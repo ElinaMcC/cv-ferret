@@ -5,6 +5,64 @@ Completed work lives in `DONE.md`.
 
 ---
 
+## LinkedIn data export import
+
+Extend the manual import path to accept a LinkedIn data export ZIP alongside
+the existing JSON template. No new import path or page needed — the manual path
+already leads into `ImportPreview`, and the LinkedIn data maps cleanly onto the
+same shape.
+
+### How users get the export
+
+LinkedIn → Settings & Privacy → Data privacy → Get a copy of your data →
+select "The works" (or at minimum: Positions, Education, Skills,
+Certifications) → request → wait for the email (usually a few minutes) →
+download ZIP.
+
+### What's in the ZIP and how it maps
+
+| LinkedIn CSV file   | Maps to           |
+|---------------------|-------------------|
+| `Positions.csv`     | `jobs`            |
+| `Education.csv`     | `education`       |
+| `Certifications.csv`| `training`        |
+| `Skills.csv`        | `skills`          |
+
+Personal details are not cleanly available in the standard export CSVs — omit
+them rather than partially import.
+
+LinkedIn tasks/bullet points are not in the export at all (only job title,
+employer, dates, description as a single field). The description field can be
+imported as a single task per job, but users should expect to expand these in
+the pool afterwards. Make this clear in the UI.
+
+### Integration with ManualPath
+
+- Accept `.zip` in addition to `.json` on the file input (`accept=".json,.zip"`)
+- Detect by extension: if ZIP, attempt LinkedIn parse; if JSON, existing flow
+- On parse success, normalise to the same `{ jobs, education, training, skills,
+  languages, personalDetails }` shape and pass to `ImportPreview` — no changes
+  to `ImportPreview` or the backend needed
+- Show instructions for obtaining the export above the file input, collapsed
+  behind a "How do I get my LinkedIn data?" disclosure, so it doesn't clutter
+  the screen for JSON users
+
+### Backend
+
+No backend changes required. The ZIP parsing and CSV-to-shape normalisation
+happens entirely in the browser (existing `file.text()` approach for CSVs;
+a ZIP library such as `fflate` or `jszip` for extraction).
+
+### Notes
+
+- LinkedIn CSV column names and formats have changed before — pin the expected
+  column headers and add a clear error if the ZIP doesn't match ("This doesn't
+  look like a LinkedIn export — check you downloaded the right file").
+- Other platforms (Indeed, Reed) don't offer structured CSV exports worth
+  targeting; the AI path (upload CV as PDF) covers those adequately.
+
+---
+
 ## Pool export and ID-aware reimport
 
 Allow users to export their Experience Pool (and optionally education, skills,
