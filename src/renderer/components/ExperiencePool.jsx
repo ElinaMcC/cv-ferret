@@ -534,6 +534,7 @@ export default function ExperiencePool({ onNavigate }) {
                             {pendingVersions[task.id].length} version{pendingVersions[task.id].length !== 1 ? 's' : ''}
                           </span>
                         </div>
+                        <p className="generation-review-note">Read each version carefully and tweak anything before saving.</p>
                         <div className="generation-review-list">
                           {pendingVersions[task.id].map((pv, idx) => (
                             <div key={idx} className="pending-version-card">

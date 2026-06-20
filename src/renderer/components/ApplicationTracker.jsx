@@ -110,6 +110,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
   const [clText, setClText] = useState('');
   const [clMeta, setClMeta] = useState({ salutation: '', closing: '', locale: 'en-GB' });
   const [clGenerating, setClGenerating] = useState(false);
+  const [clJustGenerated, setClJustGenerated] = useState(false);
   const [exportPathDefault, setExportPathDefault] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -336,6 +337,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
         closing: result.closing || '',
         locale: result.locale || 'en-GB',
       });
+      setClJustGenerated(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -546,6 +548,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
                 >
                   Open folder ↗
                 </button>
+                <p className="at-export-review-note">Review the content carefully before sending to an employer.</p>
               </div>
             ) : null}
             <div className="modal-dialog-actions">
@@ -929,7 +932,7 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
                 <textarea
                   className="at-cl-textarea"
                   value={clText}
-                  onChange={e => setClText(e.target.value)}
+                  onChange={e => { setClText(e.target.value); setClJustGenerated(false); }}
                   placeholder={
                     selectedId === 'new'
                       ? 'Save the application first to generate a cover letter.'
@@ -938,6 +941,10 @@ export default function ApplicationTracker({ onNavigate, initialSelectedId = nul
                   rows={18}
                   disabled={selectedId === 'new'}
                 />
+
+                {clJustGenerated && (
+                  <p className="at-ai-notice">Claude's draft — read it through carefully before sending to an employer.</p>
+                )}
 
                 {clText && (
                   <div className="at-cl-footer">

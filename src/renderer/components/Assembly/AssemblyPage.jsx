@@ -517,7 +517,7 @@ export default function AssemblyPage({ openDocumentId, newDocument, preselectedP
           )}
           {exportNotification && (
             <div className="asm-export-banner">
-              <span>Saved to <code className="asm-export-banner-path">{exportNotification.folderPath}</code></span>
+              <span>Saved to <code className="asm-export-banner-path">{exportNotification.folderPath}</code><span className="asm-export-review-note"> · Review before sending to an employer.</span></span>
               <div className="asm-export-banner-actions">
                 <button
                   className="btn btn-ghost btn-sm"

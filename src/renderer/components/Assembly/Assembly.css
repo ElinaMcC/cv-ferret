@@ -199,6 +199,11 @@ html.dark .asm-delete-btn:hover {
   flex-shrink: 0;
 }
 
+.asm-export-review-note {
+  color: var(--text-muted);
+  font-size: 11.5px;
+}
+
 .asm-export-banner-dismiss {
   background: none;
   border: none;
