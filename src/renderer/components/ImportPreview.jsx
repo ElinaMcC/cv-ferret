@@ -156,7 +156,7 @@ export default function ImportPreview({ extracted, onImport, onBack }) {
         <button className="btn btn-ghost btn-sm" onClick={onBack}>
           ← Back
         </button>
-        <div className="ipr-topbar-title">Review extracted data</div>
+        <div className="ipr-topbar-title">Review before importing</div>
         <button
           className="btn btn-primary"
           onClick={handleImport}
@@ -167,7 +167,7 @@ export default function ImportPreview({ extracted, onImport, onBack }) {
       </div>
 
       <p className="ipr-intro">
-        Review the extracted data below. Edit or delete anything that looks wrong, then click Import.
+        Review the data below. Edit or delete anything that looks wrong, then click Import.
       </p>
 
       {importError && <p className="ipr-error" role="alert">{importError}</p>}
