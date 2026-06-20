@@ -1,16 +1,19 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  ArrowDownTrayIcon, DocumentTextIcon, AcademicCapIcon,
-  UserIcon, SparklesIcon, CodeBracketIcon,
+  ArrowDownTrayIcon, SparklesIcon, CodeBracketIcon,
 } from '@heroicons/react/24/outline';
-import { importAPI } from '../services/ipc';
+import { importAPI, dashboardAPI } from '../services/ipc';
 import { useAppSettings } from '../contexts/AppSettingsContext';
 import ImportPreview from './ImportPreview';
 import './ImportPage.css';
 
-// ── JSON templates (for the manual path) ─────────────────────────────────────
+// ── JSON template (for the manual path) ──────────────────────────────────────
 
-const EXPERIENCE_TEMPLATE = JSON.stringify({
+const CV_TEMPLATE = JSON.stringify({
+  personalDetails: {
+    first_name: "", last_name: "", email: "", phone: "",
+    address: "", links: [], date_of_birth: "", place_of_birth: "", gender: "",
+  },
   jobs: [{
     employer: "Example Company",
     job_title: "Job Title",
@@ -18,27 +21,10 @@ const EXPERIENCE_TEMPLATE = JSON.stringify({
     end_date: null,
     location: "City, Country",
     notes: "",
-    tasks: [{
-      description: "Describe one responsibility or achievement here. Each bullet point becomes a separate task.",
-      tags: [],
-      role_priorities: [],
-    }],
+    tasks: [{ description: "One bullet point per task.", tags: [], role_priorities: [] }],
   }],
-}, null, 2);
-
-const EDUCATION_TEMPLATE = JSON.stringify({
-  education: [{
-    institution: "University Name",
-    title: "Degree or Qualification",
-    end_date: "Jun 2018",
-    notes: "",
-  }],
-  training: [{
-    institution: "Training Provider",
-    title: "Certificate or Course Name",
-    end_date: "Mar 2023",
-    notes: "",
-  }],
+  education: [{ institution: "University", title: "Degree", end_date: "Jun 2018", notes: "" }],
+  training:  [{ institution: "Provider", title: "Certificate", end_date: "Mar 2023", notes: "" }],
   skills: ["Skill One", "Skill Two"],
   languages: [{ language: "German", level: "C1" }],
 }, null, 2);
@@ -73,8 +59,13 @@ export default function ImportPage({ onNavigate }) {
   const [extracted, setExtracted]     = useState(null);
   const [importResult, setImportResult] = useState(null);
   const [isDragging, setIsDragging]   = useState(false);
+  const [existingJobCount, setExistingJobCount] = useState(0);
 
   const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    dashboardAPI.getSummary().then(d => setExistingJobCount(d.stats.jobCount)).catch(() => {});
+  }, []);
 
   const cvText = pasteText.trim() || fileText;
 
@@ -274,9 +265,9 @@ export default function ImportPage({ onNavigate }) {
         <div className="ip-header">
           <button className="btn btn-ghost btn-sm ip-back" onClick={() => setStep('choose')}>← Back</button>
           <h1 className="ip-title">Import manually</h1>
-          <p className="ip-subtitle">Download the JSON templates, prepare your data, and upload a file for each section.</p>
+          <p className="ip-subtitle">Download a single JSON template, fill it in, and upload it to import everything at once.</p>
         </div>
-        <ManualPath onNavigate={onNavigate} />
+        <ManualPath onDone={handleImportDone} />
       </div>
     );
   }
@@ -288,6 +279,15 @@ export default function ImportPage({ onNavigate }) {
         <h1 className="ip-title">Import your CV</h1>
         <p className="ip-subtitle">Choose how you'd like to bring your data into CV Ferret.</p>
       </div>
+
+      {existingJobCount > 0 && (
+        <div className="ip-existing-warning" role="note">
+          <strong>Your Experience Pool already has {existingJobCount} job{existingJobCount !== 1 ? 's' : ''} in it.</strong>
+          {' '}Import adds to what's there — it doesn't check for duplicates. If a job in the CV you're importing already exists in the pool, you'll end up with two separate entries. Check your{' '}
+          <button className="ip-inline-link" onClick={() => onNavigate('experience-pool')}>Experience Pool</button>
+          {' '}before continuing if you're not sure.
+        </div>
+      )}
 
       <div className="ip-path-tiles">
 
@@ -314,7 +314,7 @@ export default function ImportPage({ onNavigate }) {
           <CodeBracketIcon className="ip-path-tile-icon" aria-hidden="true" />
           <span className="ip-path-tile-title">Import manually</span>
           <span className="ip-path-tile-desc">
-            Download JSON templates, prepare your data using any tool you like, and upload the files section by section.
+            Download a single JSON template, fill it in, and upload it to import everything at once.
           </span>
         </button>
 
@@ -325,43 +325,52 @@ export default function ImportPage({ onNavigate }) {
 
 // ── Manual path ───────────────────────────────────────────────────────────────
 
-function ManualPath({ onNavigate }) {
+function ManualPath({ onDone }) {
+  const [preview, setPreview]       = useState(null);
+  const [parseError, setParseError] = useState('');
+
+  function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setParseError(''); setPreview(null);
+    file.text().then(text => {
+      try {
+        const data = JSON.parse(text);
+        setPreview({
+          personalDetails: data.personalDetails || {},
+          jobs:            data.jobs            || [],
+          education:       data.education       || [],
+          training:        data.training        || [],
+          skills:          data.skills          || [],
+          languages:       data.languages       || [],
+        });
+      } catch {
+        setParseError('Could not parse this file as JSON. Validate it at jsonlint.com to find the issue.');
+      }
+    });
+    e.target.value = '';
+  }
+
+  if (preview) {
+    return (
+      <ImportPreview
+        extracted={preview}
+        onBack={() => setPreview(null)}
+        onImport={onDone}
+      />
+    );
+  }
+
   return (
-    <div className="ip-manual">
-      <div className="ip-manual-step">
-        <div className="ip-manual-step-icon" aria-hidden="true"><UserIcon /></div>
-        <div className="ip-manual-step-body">
-          <h3 className="ip-manual-step-title">Personal details</h3>
-          <p className="ip-manual-step-desc">Fill in your personal details directly in the app.</p>
-          <button className="btn btn-secondary btn-sm" onClick={() => onNavigate('personal')}>
-            Go to Personal Details
-          </button>
-        </div>
-      </div>
-
-      <div className="ip-manual-step">
-        <div className="ip-manual-step-icon" aria-hidden="true"><DocumentTextIcon /></div>
-        <div className="ip-manual-step-body">
-          <h3 className="ip-manual-step-title">Work experience</h3>
-          <p className="ip-manual-step-desc">
-            Use a tool of your choice to build or convert your CV in the JSON format below,
-            then upload the file here.
-          </p>
-          <TemplateDownload label="Download experience template" filename="experience-template.json" content={EXPERIENCE_TEMPLATE} />
-          <ManualJsonImport type="experience" />
-        </div>
-      </div>
-
-      <div className="ip-manual-step">
-        <div className="ip-manual-step-icon" aria-hidden="true"><AcademicCapIcon /></div>
-        <div className="ip-manual-step-body">
-          <h3 className="ip-manual-step-title">Education &amp; skills</h3>
-          <p className="ip-manual-step-desc">
-            Use the same approach for education, training, skills, and languages.
-          </p>
-          <TemplateDownload label="Download education template" filename="education-template.json" content={EDUCATION_TEMPLATE} />
-          <ManualJsonImport type="education" />
-        </div>
+    <div className="ip-manual-card">
+      <p className="ip-manual-intro">Download the template, fill it in with your data, and upload it.</p>
+      <TemplateDownload label="Download CV template" filename="cv-template.json" content={CV_TEMPLATE} />
+      <div className="ip-manual-json">
+        <label className="ip-manual-json-label">
+          Upload JSON file
+          <input type="file" accept=".json" onChange={handleFile} className="ip-file-input" />
+        </label>
+        {parseError && <p className="ip-error">{parseError}</p>}
       </div>
     </div>
   );
@@ -380,94 +389,6 @@ function TemplateDownload({ label, filename, content }) {
   return (
     <button className="btn btn-ghost btn-sm ip-template-btn" onClick={download}>{label}</button>
   );
-}
-
-// ── Manual JSON import ────────────────────────────────────────────────────────
-
-function ManualJsonImport({ type }) {
-  const isExperience = type === 'experience';
-  const [parsed, setParsed]           = useState(null);
-  const [parseError, setParseError]   = useState('');
-  const [importing, setImporting]     = useState(false);
-  const [importError, setImportError] = useState('');
-  const [success, setSuccess]         = useState('');
-
-  function handleFile(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    setParsed(null); setParseError(''); setImportError(''); setSuccess('');
-    file.text().then(text => {
-      try {
-        const data = JSON.parse(text);
-        setParsed({ data, summary: buildManualSummary(data, isExperience) });
-      } catch {
-        setParseError('Could not parse this file as JSON. Validate it at jsonlint.com to find the issue.');
-      }
-    });
-    e.target.value = '';
-  }
-
-  async function handleImport() {
-    if (!parsed) return;
-    setImporting(true); setImportError('');
-    try {
-      const result = isExperience
-        ? await importAPI.importExperience(parsed.data.jobs)
-        : await importAPI.importEducation(parsed.data);
-      setSuccess(buildSuccessMsg(result, isExperience));
-      setParsed(null);
-    } catch (err) {
-      setImportError(err.message);
-    } finally {
-      setImporting(false);
-    }
-  }
-
-  return (
-    <div className="ip-manual-json">
-      <label className="ip-manual-json-label">
-        Upload JSON file
-        <input type="file" accept=".json" onChange={handleFile} className="ip-file-input" />
-      </label>
-      {parseError  && <p className="ip-error">{parseError}</p>}
-      {importError && <p className="ip-error">{importError}</p>}
-      {success     && <p className="ip-success">{success}</p>}
-      {parsed && (
-        <div className="ip-manual-json-ready">
-          <span className="ip-manual-json-summary">✓ {parsed.summary}</span>
-          <button className="btn btn-primary btn-sm" onClick={handleImport} disabled={importing}>
-            {importing ? 'Importing…' : 'Import'}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function buildManualSummary(data, isExperience) {
-  if (isExperience) {
-    const jobs  = Array.isArray(data.jobs) ? data.jobs : [];
-    const tasks = jobs.reduce((n, j) => n + (Array.isArray(j.tasks) ? j.tasks.length : 0), 0);
-    return `${jobs.length} job${jobs.length !== 1 ? 's' : ''}, ${tasks} task${tasks !== 1 ? 's' : ''}`;
-  }
-  const parts = [];
-  if ((data.education  || []).length) parts.push(`${data.education.length} education`);
-  if ((data.training   || []).length) parts.push(`${data.training.length} training`);
-  if ((data.skills     || []).length) parts.push(`${data.skills.length} skills`);
-  if ((data.languages  || []).length) parts.push(`${data.languages.length} languages`);
-  return parts.join(', ') || 'nothing recognised';
-}
-
-function buildSuccessMsg(result, isExperience) {
-  if (isExperience) {
-    return `Imported ${result.jobs} job${result.jobs !== 1 ? 's' : ''} with ${result.tasks} task${result.tasks !== 1 ? 's' : ''}.`;
-  }
-  const parts = [];
-  if (result.education)   parts.push(`${result.education} education`);
-  if (result.training)    parts.push(`${result.training} training`);
-  if (result.skillsAdded) parts.push(`${result.skillsAdded} skill${result.skillsAdded !== 1 ? 's' : ''}`);
-  if (result.languages)   parts.push(`${result.languages} language${result.languages !== 1 ? 's' : ''}`);
-  return `Imported: ${parts.join(', ') || 'nothing new'}.`;
 }
 
 // ── Import summary (success screen) ──────────────────────────────────────────

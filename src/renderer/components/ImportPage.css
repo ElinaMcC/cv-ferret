@@ -307,6 +307,30 @@
   margin-bottom: 4px;
 }
 
+/* ── Existing-data warning ───────────────────────────────────────────────────── */
+
+.ip-existing-warning {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-warning-text, #92400e);
+  background: var(--color-warning-bg, #fef3c7);
+  border: 1px solid var(--color-warning-border, #fcd34d);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+}
+
+.ip-inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-warning-text, #92400e);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+}
+
 /* ── Path tiles ──────────────────────────────────────────────────────────────── */
 
 .ip-path-tiles {
@@ -369,52 +393,19 @@
 
 /* ── Manual path ─────────────────────────────────────────────────────────────── */
 
-.ip-manual {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.ip-manual-step {
-  display: flex;
-  gap: 16px;
+.ip-manual-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 18px 20px;
-}
-
-.ip-manual-step-icon {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-.ip-manual-step-icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-.ip-manual-step-body {
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex: 1;
+  gap: 16px;
 }
 
-.ip-manual-step-title {
+.ip-manual-intro {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--text-heading);
-}
-
-.ip-manual-step-desc {
-  font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.5;
 }
 
 .ip-template-btn {
@@ -427,7 +418,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-top: 4px;
 }
 
 .ip-manual-json-label {
@@ -444,18 +434,3 @@
   color: var(--text-secondary);
 }
 
-.ip-manual-json-ready {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--color-success-bg);
-  border: 1px solid var(--color-success-border);
-  border-radius: 4px;
-  padding: 8px 12px;
-}
-
-.ip-manual-json-summary {
-  font-size: 13px;
-  color: var(--color-success-text);
-  flex: 1;
-}
