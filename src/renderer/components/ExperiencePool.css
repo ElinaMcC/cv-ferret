@@ -456,6 +456,13 @@
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
 }
+.generation-review-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: -4px 0 10px;
+}
+
 .generation-review-actions {
   display: flex;
   gap: 8px;

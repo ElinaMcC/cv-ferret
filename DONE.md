@@ -270,3 +270,44 @@ does not deduplicate — with a direct link to the pool to check before proceedi
   ("Review before importing" / "Review the data below…")
 
 **Landed:** commit `a95d2f3` on `feature/phase-9-tests`
+
+---
+
+## Help page — Import card and Getting started update
+
+Added an "Importing your data" card to `appKnowledge.json` explaining both
+the AI path (DOCX, PDF, Markdown, plain text or paste → Claude extracts
+everything → review screen) and the manual JSON path (no AI required), and
+the shared review screen both paths lead to. Updated the "Getting started"
+entry to lead with Import as the fastest first step for users who already
+have a CV, with manual data entry as the alternative.
+
+Because `appKnowledge.json` feeds both the Help page and the AI chat system
+prompt, the AI assistant in Assembly also picked up the import knowledge
+automatically.
+
+**Landed:** commit `0eba47c` on `feature/phase-9-tests`
+
+---
+
+## Contextual AI review reminders
+
+Added lightweight, non-blocking reminders at the two moments they matter most:
+
+- **Cover letter** (`ApplicationTracker.jsx`) — info-style notice appears
+  below the textarea immediately after generation; clears permanently on
+  first keystroke. Copy: "Claude's draft — read it through carefully before
+  sending to an employer."
+- **Task versions** (`ExperiencePool.jsx`) — small italic line in the pending
+  versions review header: "Read each version carefully and tweak anything
+  before saving."
+- **Assembly export banner** (`AssemblyPage.jsx`) — inline after the file
+  path: " · Review before sending to an employer."
+- **Application Tracker export modal** (`ApplicationTracker.jsx`) — muted
+  line at the bottom of the success result block.
+
+No modals, no dismissible banners, no gates — each reminder appears once at
+the moment it's contextually relevant. AI chat suggestions were deliberately
+excluded (users already click "Apply" per suggestion, which is a review gesture).
+
+**Landed:** commit `62ec99d` on `feature/phase-9-tests`

@@ -5,6 +5,107 @@ Completed work lives in `DONE.md`.
 
 ---
 
+## LinkedIn data export import
+
+Extend the manual import path to accept a LinkedIn data export ZIP alongside
+the existing JSON template. No new import path or page needed — the manual path
+already leads into `ImportPreview`, and the LinkedIn data maps cleanly onto the
+same shape.
+
+### How users get the export
+
+LinkedIn → Settings & Privacy → Data privacy → Get a copy of your data →
+select "The works" (or at minimum: Positions, Education, Skills,
+Certifications) → request → wait for the email (usually a few minutes) →
+download ZIP.
+
+### What's in the ZIP and how it maps
+
+| LinkedIn CSV file   | Maps to           |
+|---------------------|-------------------|
+| `Positions.csv`     | `jobs`            |
+| `Education.csv`     | `education`       |
+| `Certifications.csv`| `training`        |
+| `Skills.csv`        | `skills`          |
+
+Personal details are not cleanly available in the standard export CSVs — omit
+them rather than partially import.
+
+LinkedIn tasks/bullet points are not in the export at all (only job title,
+employer, dates, description as a single field). The description field can be
+imported as a single task per job, but users should expect to expand these in
+the pool afterwards. Make this clear in the UI.
+
+### Integration with ManualPath
+
+- Accept `.zip` in addition to `.json` on the file input (`accept=".json,.zip"`)
+- Detect by extension: if ZIP, attempt LinkedIn parse; if JSON, existing flow
+- On parse success, normalise to the same `{ jobs, education, training, skills,
+  languages, personalDetails }` shape and pass to `ImportPreview` — no changes
+  to `ImportPreview` or the backend needed
+- Show instructions for obtaining the export above the file input, collapsed
+  behind a "How do I get my LinkedIn data?" disclosure, so it doesn't clutter
+  the screen for JSON users
+
+### Backend
+
+No backend changes required. The ZIP parsing and CSV-to-shape normalisation
+happens entirely in the browser (existing `file.text()` approach for CSVs;
+a ZIP library such as `fflate` or `jszip` for extraction).
+
+### Notes
+
+- LinkedIn CSV column names and formats have changed before — pin the expected
+  column headers and add a clear error if the ZIP doesn't match ("This doesn't
+  look like a LinkedIn export — check you downloaded the right file").
+- Other platforms (Indeed, Reed) don't offer structured CSV exports worth
+  targeting; the AI path (upload CV as PDF) covers those adequately.
+
+---
+
+## Pool export and ID-aware reimport
+
+Allow users to export their Experience Pool (and optionally education, skills,
+and languages) as a JSON file in the same format as the import template — but
+with internal IDs included. This creates a clean round-trip workflow:
+
+1. **Export** — download the pool as JSON with IDs, employer names, job titles,
+   dates, and all task versions intact.
+2. **Edit externally** — add new task versions, tweak wording, restructure, or
+   use the data in other tools entirely.
+3. **Reimport** — upload the edited JSON. Jobs whose `id` matches an existing
+   pool entry have tasks merged in rather than creating a duplicate job entry.
+   Jobs without an `id` (or with an unrecognised one) are treated as new, as
+   today.
+
+**Why it matters for the target audience:** a technical user who already has CV
+data in another tool (Notion, Obsidian, a spreadsheet, a bespoke script) gets
+a stable, documented JSON contract to work against. CV Ferret becomes
+interoperable rather than a walled garden, which is consistent with its
+local-first, transparency-first ethos.
+
+**Design notes:**
+- The export format should be a strict superset of the import template — every
+  valid export is a valid import, just with IDs added. No separate schema to
+  maintain.
+- IDs only matter at the job level for deduplication. Task IDs could be included
+  for completeness (and future update-in-place scenarios) but aren't needed for
+  the core merge behaviour.
+- `ImportPreview` should make the merge behaviour visible: imported jobs that
+  matched an existing entry should be labelled "merging into existing job" rather
+  than "new job", so the user can see what will happen before confirming.
+- A fuzzy-match fallback (employer + title) could be offered as a suggestion
+  in `ImportPreview` for JSONs without IDs, letting users opt in to merging
+  without needing to know the ID.
+- Export should live on the Experience Pool page (and/or a dedicated Data
+  page if one is ever added), not buried in Settings.
+
+**When to consider:** after the Import page is stable. Export is a prerequisite
+for the ID-aware reimport to be practical — without it, users would need to
+inspect internal data to find IDs.
+
+---
+
 ## Guided setup walkthrough
 
 A "walk me through setup" mode on the Dashboard — a step-by-step wizard that
@@ -17,7 +118,7 @@ guides new users through each setup task in sequence. Key design notes:
   alongside it as an opt-in mode.
 - The import step should be first and prominent; settings (export path, API key)
   should follow; pool refinement last.
-- When to consider: after the Dashboard onboarding redesign (Phase 8) is stable.
+- Phase 8 is now complete — this is ready to consider.
 
 ---
 
@@ -49,7 +150,7 @@ with job-ad-tailored versions over time.
 **Token/cost note:** rewrites the full pool in one call — could be expensive.
 Mitigation: compress pool to default versions only; warn user before generating.
 
-**When to consider:** now that the Import page and core workflow are stable.
+**When to consider:** the Import page and core workflow are now stable — this is ready to consider.
 
 ---
 

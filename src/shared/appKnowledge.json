@@ -30,8 +30,13 @@
     "body": "The sidebar has these sections: Home (your dashboard), Experience Pool, Education & Skills, Personal Details, CV Library, Assembly (the CV editor), Reference Letters, Application Tracker, Import, Help, and Settings."
   },
   {
+    "id": "import",
+    "title": "Importing your data",
+    "body": "The Import page is the fastest way to get your data into CV Ferret if you already have a CV. The AI path accepts a DOCX, PDF, Markdown, or plain text file — or you can paste your CV text directly — and Claude extracts your jobs, tasks, education, skills, languages, and personal details automatically. The manual path lets you download a JSON template, fill it in with your own data using any text editor, and upload it; no AI required. Both paths lead to the same review screen where you can edit or remove anything before it's saved."
+  },
+  {
     "id": "getting-started",
     "title": "Getting started",
-    "body": "If you're new, the suggested order is: fill in Personal Details, build up your Experience Pool with jobs and tasks, add Education & Skills, then create a CV in CV Library/Assembly, and track applications in the Application Tracker."
+    "body": "If you already have a CV, the quickest start is the Import page — the AI path can extract everything from a DOCX or PDF in one go, or use the manual JSON path if you prefer not to use AI. If you're starting from scratch or prefer to enter data directly, the suggested order is: Personal Details, then Experience Pool (jobs and tasks), then Education & Skills. Once your pool is built, create a CV in CV Library and Assembly, and track your job applications in the Application Tracker."
   }
 ]
