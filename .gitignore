@@ -31,12 +31,22 @@ ARCHITECTURE.md
 CV-EXTRACTION.md
 ICON_GUIDELINES.md
 PARKING-LOT.md
+CODE-QUALITY-OPTIMIZATION.md
+TEST-OPTIMIZATION.md
+UX-OPTIMIZATION.md
 
 # Claude Code internal memory
 memory/
+
+# Claude Code dev-only slash commands
+.claude/commands/dev.md
 
 # Test / scratch files
 test-doc.pdf
 
 # Electron Forge / webpack build artefacts
 .webpack/
+
+# Playwright run artefacts (test specs in e2e/ are still committed)
+test-results/
+playwright-report/

@@ -18,8 +18,7 @@ Use **Heroicons** (`@heroicons/react`) exclusively. Do not introduce other icon 
 
 ## Shared UI patterns
 A code quality review found the same UI patterns reimplemented separately
-across components (see `CODE-QUALITY-OPTIMIZATION.md` for the full
-writeup and migration plan). Going forward:
+across components. Going forward:
 
 - **Modal/dialog overlays** — use the shared `.modal-overlay` /
   `.modal-dialog` classes in `src/renderer/styles/shared.css`. Do not add a
