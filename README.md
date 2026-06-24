@@ -17,7 +17,7 @@ npm install
 
 ### Development
 
-1. Open a terminal in this folder
+1. Open a terminal in the folder where you have this project.
 2. Run: `npm run dev`
 3. Open your browser at **http://localhost:5173**
 
